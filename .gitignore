@@ -286,3 +286,9 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+/SolarWind/SolarWind/sfml-window-d-2.dll
+/SolarWind/SolarWind/sfml-system-d-2.dll
+/SolarWind/SolarWind/sfml-network-d-2.dll
+/SolarWind/SolarWind/sfml-graphics-d-2.dll
+/SolarWind/SolarWind/sfml-audio-d-2.dll
+/SolarWind/SolarWind/openal32.dll
