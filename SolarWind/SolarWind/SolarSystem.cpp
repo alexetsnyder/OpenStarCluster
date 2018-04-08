@@ -51,7 +51,8 @@ void SolarSystem::GenerateSolarSystem()
 	_star.SetPosition(sf::Vector2f(_center.x - _star.GetRadius(), _center.y - _star.GetRadius()));
 	currentRadius += _star.GetRadius();
 
-	while (currentRadius < _maxRadius - 20.0f)
+	int planetCount = (rand() % 12) + 1;
+	while (currentRadius < _maxRadius - 20.0f && planetCount-- > 0)
 	{
 		ranOnce = true;
 
