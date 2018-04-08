@@ -5,12 +5,19 @@
 
 SolarSystem::SolarSystem()
 {
-
+	_arial.loadFromFile("Fonts\arial.ttf");
+	_nameText.setFont(_arial);
+	_nameText.setStyle(sf::Text::Regular);
+	_nameText.setCharacterSize(22);
 }
 
 SolarSystem::SolarSystem(SGC sgc)
 {
 	_sgc = sgc;
+	_arial.loadFromFile("Fonts\\arial.ttf");
+	_nameText.setFont(_arial);
+	_nameText.setStyle(sf::Text::Regular);
+	_nameText.setCharacterSize(22);
 }
 
 SolarSystem::SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius)
@@ -18,6 +25,10 @@ SolarSystem::SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius)
 	_sgc = sgc;
 	_center = center;
 	_maxRadius = maxRadius;
+	_arial.loadFromFile("Fonts\\arial.ttf");
+	_nameText.setFont(_arial);
+	_nameText.setStyle(sf::Text::Regular);
+	_nameText.setCharacterSize(22);
 }
 
 SolarSystem::SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius, SolarSystemConstants ssc)
@@ -26,6 +37,10 @@ SolarSystem::SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius, SolarSys
 	_center = center;
 	_maxRadius = maxRadius;
 	_ssc = ssc;
+	_arial.loadFromFile("Fonts\\arial.ttf");
+	_nameText.setFont(_arial);
+	_nameText.setStyle(sf::Text::Bold);
+	_nameText.setCharacterSize(20);
 }
 
 void SolarSystem::GenerateSolarSystem()
@@ -51,6 +66,8 @@ void SolarSystem::GenerateSolarSystem()
 	}
 	float randMinForStar = GetRandMin(_maxRadius, _ssc.StarMinPercOfMaxSize);
 
+	_star = Star();
+	_star.Init();
 	_star.SetSGC(_sgc);
 	_star.SetRadius((rand() % randModForStar) + randMinForStar);
 	_star.SetPosition(sf::Vector2f(_center.x - _star.GetRadius(), _center.y - _star.GetRadius()));
@@ -76,6 +93,7 @@ void SolarSystem::GenerateSolarSystem()
 		ranOnce = true;
 
 		_planets.push_back(Planet());
+		_planets[index].Init();
 		_planets[index].SetSGC(_sgc);
 		int randModForPlanet;
 		if (!GetRandMod(_star.GetRadius(), _ssc.PlanetMinPercOfStarRadius, _ssc.PlanetMaxPercOfStarRadius, randModForPlanet))
@@ -120,6 +138,9 @@ void SolarSystem::GenerateSolarSystem()
 	{
 		printf("No Planets were generated. Try increasing max radius.");
 	}
+
+	printf("\n----------------------------------------------------------------\n");
+
 }
 
 const sf::Texture& SolarSystem::DrawTexture()
@@ -131,12 +152,41 @@ const sf::Texture& SolarSystem::DrawTexture()
 		_system.draw(planet.GetOrbit());
 		_system.draw(planet.GetObject());
 	}
+	_system.draw(_nameText);	
 	_system.display();
 	return _system.getTexture();
 }
 
-void SolarSystem::Update()
+void SolarSystem::Update(sf::Vector2i mousePos)
 {
+	_nameText.setFillColor(sf::Color::Transparent);
+	_star.SetColor(sf::Color::Red);
+	for (Planet& planet : _planets)
+	{
+		planet.SetColor(sf::Color::Green);
+	}
+
+	if (_star.IsWithin(mousePos))
+	{
+		_star.SetColor(sf::Color::Blue);
+		_nameText.setPosition(mousePos.x + 5.0f, mousePos.y);
+		_nameText.setFillColor((_star.IsNewName()) ? sf::Color::Green : sf::Color::Yellow);
+		_nameText.setString(_star.GetName());
+	}
+	else
+	{
+		for (Planet& planet : _planets)
+		{
+			if (planet.IsWithin(mousePos))
+			{
+				planet.SetColor(sf::Color::Red);
+				_nameText.setPosition(mousePos.x + 5.0f, mousePos.y);
+				_nameText.setFillColor((planet.IsNewName()) ? sf::Color::Green : sf::Color::Yellow);
+				_nameText.setString(planet.GetName());
+			}
+		}
+	}
+
 	//SimulatePlanets();
 }
 

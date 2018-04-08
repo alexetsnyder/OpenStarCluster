@@ -4,15 +4,20 @@
 #include <vector>
 using namespace std;
 
-NameGenerator::NameGenerator(int order)
+NameGenerator::NameGenerator()
 {
-	_markovChain = MarkovChain<string, char>(order);
+	
 }
 
 NameGenerator::NameGenerator(string fileName, int order)
 {
 	_markovChain = MarkovChain<string, char>(order);
 	LoadDataFromFile(fileName);
+}
+
+void NameGenerator::Init(int order)
+{
+	_markovChain = MarkovChain<string, char>(order);
 }
 
 void NameGenerator::LoadDataFromFile(string fileName)
@@ -25,19 +30,31 @@ void NameGenerator::LoadDataFromFile(string fileName)
 		string line;
 		while (getline(fin, line))
 		{
-			string word = line.substr(0, line.find(" "));
-			chunks.push_back(word);
-			_nameHistory.push_back(word);
+			int start = 0;
+			int end; 
+			while ((end = line.find(',', start)) != -1)
+			{
+				string word = line.substr(start, end-start);
+				chunks.push_back(word);
+				_nameHistory.push_back(word);
+				start = end+1;
+			}
+			chunks.push_back(line.substr(start+1));
+			_nameHistory.push_back(line.substr(start + 1));
 		}
-		_markovChain.CreateFrequencyTable(chunks);
+		if (_markovChain.CreateFrequencyTable(chunks))
+		{
+			_isReady = true;
+		}
 
 		fin.close();
+
 	}
 }
 
-bool NameGenerator::GenerateWord(int length, string& outString)
+bool NameGenerator::GenerateWord(int minLength, int maxLength, string& outString)
 {
-	if (_markovChain.GenerateNewChunk(length, outString))
+	if (_markovChain.GenerateNewChunk(minLength, maxLength, outString))
 		return true;
 	return false;
 }

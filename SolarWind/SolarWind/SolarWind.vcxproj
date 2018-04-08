@@ -139,6 +139,13 @@
     <ClInclude Include="SGC.h" />
     <ClInclude Include="SolarSystem.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Names\exoplanet_names.txt" />
+    <Text Include="Names\star_names.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Fonts\arial.ttf" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

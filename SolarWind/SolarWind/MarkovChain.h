@@ -13,7 +13,7 @@ class MarkovChain
 		MarkovChain(int order=1);
 		
 		bool CreateFrequencyTable(std::vector<chunkT> chunks);
-		bool GenerateNewChunk(int length, chunkT& outChunk);
+		bool GenerateNewChunk(int minLength, int maxLength, chunkT& outChunk);
 		bool GetNextKey(std::deque<keyT> keys, keyT& outKey);
 
 	private:
@@ -108,7 +108,7 @@ bool MarkovChain<chunkT, keyT>::AddKeys(std::deque<keyT> keys)
 }
 
 template <class chunkT, class keyT>
-bool MarkovChain<chunkT, keyT>::GenerateNewChunk(int length, chunkT& outChunk)
+bool MarkovChain<chunkT, keyT>::GenerateNewChunk(int minLength, int maxLength, chunkT& outChunk)
 {
 	int MAX_TRIES = 50;
 	outChunk = chunkT();
@@ -127,16 +127,27 @@ bool MarkovChain<chunkT, keyT>::GenerateNewChunk(int length, chunkT& outChunk)
 			keyT key;
 			if (!GetNextKey(selectedKeys, key))
 			{
+				if (outChunk.size() >= minLength)
+				{
+					return true;
+				}
+
+				outChunk = chunkT();
+				selectedKeys.clear();
+				for (int i = 0; i < _order; ++i)
+				{
+					selectedKeys.push_back(keyT());
+				}
 				break;
 			}
 			else
 			{
-				count = 0;
 				outChunk.push_back(key);
-				if (outChunk.size() == length)
+				if (outChunk.size() == maxLength)
 				{
 					return true;
 				}
+
 				selectedKeys.pop_front();
 				selectedKeys.push_back(key);
 			}

@@ -33,7 +33,7 @@ class SolarSystem
 		void GenerateSolarSystem();
 
 		const sf::Texture& DrawTexture();
-		void Update();
+		void Update(sf::Vector2i mousePos);
 
 		void SetSGC(SGC sgc) { _sgc = sgc; }
 		void SetSSC(SolarSystemConstants ssc) { _ssc = ssc; }
@@ -43,6 +43,8 @@ class SolarSystem
 
 		SGC _sgc;
 		SolarSystemConstants _ssc;
+		sf::Text _nameText;
+		sf::Font _arial;
 		float _maxRadius;
 		sf::Vector2f _center;
 		Star _star;
