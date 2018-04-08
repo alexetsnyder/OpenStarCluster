@@ -32,18 +32,21 @@ Planet::Planet(sf::Vector2f position, float radius, sf::Color color)
 
 }
 
-void Planet::CalculateNewPosition()
-{
-	sf::Time time = GetSGC().TIME.getElapsedTime();
-	_orbit.CalculateNextOrbitAngle(time);
-	SetPosition(_orbit.GetOrbitPosition());
-}
-
-void Planet::CalculatePosition(sf::Vector2f orbitPos, float orbitRadius)
+void Planet::CreateOrbit(sf::Vector2f orbitPos, float orbitRadius)
 {
 	_orbit.SetRadius(orbitRadius);
 	_orbit.SetPosition(sf::Vector2f(orbitPos.x, orbitPos.y));
 	_orbit.SetVelocity(0.00005f);
+}
+
+void Planet::UpdateOrbit()
+{
+	sf::Time time = GetSGC().TIME.getElapsedTime();
+	_orbit.CalculateNextOrbitAngle(time);
+}
+
+void Planet::CalculatePosition()
+{
 	sf::Vector2f planetPos = _orbit.GetOrbitPosition();
 	float xPos = planetPos.x - GetRadius();
 	float yPos = planetPos.y - GetRadius();

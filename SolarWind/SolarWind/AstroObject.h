@@ -31,8 +31,9 @@ class Planet : public AstroObject
 		Planet();
 		Planet(sf::Vector2f position, float radius, sf::Color color = sf::Color::Green);
 
-		void CalculateNewPosition();
-		void CalculatePosition(sf::Vector2f orbitPos, float orbitRadius);
+		void CreateOrbit(sf::Vector2f orbitPos, float orbitRadius);
+		void UpdateOrbit();
+		void CalculatePosition();
 
 		sf::CircleShape GetOrbit() { return _orbit.GetOrbit(); }
 

@@ -11,14 +11,27 @@ int main(int argc, char* args[])
 	srand(time(0));
 
 	SGC sgc;
-	sgc.WINDOW_HEIGHT = 800;
-	sgc.WINDOW_WIDTH = 1000;
+	sgc.WINDOW_WIDTH = 1920; // 1000;
+	sgc.WINDOW_HEIGHT = 980; // 800;
 	sgc.TIME = sf::Clock();
 
 	sf::RenderWindow window(sf::VideoMode(sgc.WINDOW_WIDTH, sgc.WINDOW_HEIGHT), "Solar Wind!");
 	
+	SolarSystemConstants ssc;
+	ssc.RadiusPadding = 0.0f;
+	ssc.PlanetPadding = 0.0f;
+	ssc.TotalPlanetCount = 12;
+	ssc.StarMinPercOfMaxSize = 0.01f;
+	ssc.StarMaxPercOfMaxSize = 0.10f;
+	ssc.OrbitMinPercGrowth = 0.10f;
+	ssc.OrbitMaxPercGrowth = 0.60f;
+	ssc.OrbitMinPercOfStarRadius = 0.01f;
+	ssc.OrbitMaxPercOfMaxStarRadius = 0.40f;
+	ssc.PlanetMinPercOfStarRadius = 0.10f;
+	ssc.PlanetMaxPercOfStarRadius = 0.40f;
+
 	float radius = GetInscribedCircleRadius(sgc.WINDOW_WIDTH, sgc.WINDOW_HEIGHT);
-	SolarSystem solarSystem(sgc, sf::Vector2f(sgc.WINDOW_WIDTH / 2.0f, sgc.WINDOW_HEIGHT / 2.0f), radius);
+	SolarSystem solarSystem(sgc, sf::Vector2f(sgc.WINDOW_WIDTH / 2.0f, sgc.WINDOW_HEIGHT / 2.0f), radius, ssc);
 	solarSystem.GenerateSolarSystem();
 
 	sf::Vertex vertexes1[2] =
@@ -50,23 +63,26 @@ int main(int argc, char* args[])
 		solarSystem.Update();
 
 		window.clear(sf::Color::Black);
-		sf::Sprite sprite(solarSystem.DrawTexture());
-		window.draw(sprite);
+
 		window.draw(vertexes1, 2, sf::Lines);
 		window.draw(vertexes2, 2, sf::Lines);
+
+		sf::Sprite sprite(solarSystem.DrawTexture());
+		window.draw(sprite);
+
 		window.display();
 
 		sgc.TIME.restart();
 	}
 
-	NameGenerator nameGenerator("C:\\Users\\alexe\\Google Drive\\root\\names.txt", 3);
+	/*NameGenerator nameGenerator("C:\\Users\\alexe\\Google Drive\\root\\names.txt", 3);
 	printf("Order 3 Markov Chain:\n");
 	std::string name;
 	for (int i = 0; i < 20; ++i)
 	{
 		if (nameGenerator.GenerateWord((rand() % 9) + 4, name))
 			printf("%s %s\n", (nameGenerator.IsNewName(name)) ? "" : ">>", name.c_str());
-	}
+	}*/
 
 	std::cin.ignore();
 
