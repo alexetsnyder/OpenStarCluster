@@ -21,6 +21,18 @@
     <ClCompile Include="NameGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AstroObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SolarSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Orbit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MathHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Chain.h">
@@ -30,6 +42,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NameGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AstroObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SolarSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Orbit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SGC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MathHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
