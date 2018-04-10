@@ -179,7 +179,7 @@ void SolarSystem::Update(sf::Vector2i mousePos)
 		{
 			if (planet.IsWithin(mousePos))
 			{
-				planet.SetColor(sf::Color::Red);
+				planet.SetColor(sf::Color::Blue);
 				_nameText.setPosition(mousePos.x + 5.0f, mousePos.y);
 				_nameText.setFillColor((planet.IsNewName()) ? sf::Color::Green : sf::Color::Yellow);
 				_nameText.setString(planet.GetName());
