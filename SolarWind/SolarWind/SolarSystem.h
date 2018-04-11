@@ -32,7 +32,8 @@ class SolarSystem
 
 		void GenerateSolarSystem();
 
-		const sf::Texture& DrawTexture();
+		void DrawTexture();
+		const sf::Texture& GetTexture();
 		void Update(sf::Vector2i mousePos);
 
 		void SetSGC(SGC sgc) { _sgc = sgc; }

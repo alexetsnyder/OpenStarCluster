@@ -143,7 +143,7 @@ void SolarSystem::GenerateSolarSystem()
 
 }
 
-const sf::Texture& SolarSystem::DrawTexture()
+void SolarSystem::DrawTexture()
 {
 	_system.clear(sf::Color::Black);
 	_system.draw(_star.GetObject());
@@ -154,6 +154,10 @@ const sf::Texture& SolarSystem::DrawTexture()
 	}
 	_system.draw(_nameText);	
 	_system.display();
+}
+
+const sf::Texture& SolarSystem::GetTexture()
+{
 	return _system.getTexture();
 }
 

@@ -19,51 +19,75 @@
     <Filter Include="Resource Files\Fonts">
       <UniqueIdentifier>{096f241d-39cc-4bf3-ba39-1156f590ffdb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\SolarSystem">
+      <UniqueIdentifier>{f8c085a7-e71c-43b2-b733-870b74b3f5eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\SolarSystem">
+      <UniqueIdentifier>{d9dc7208-0a9e-46ed-a958-f77d6072aacf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MarkovChains">
+      <UniqueIdentifier>{a32c1c10-c5f6-4798-b2fe-244befcb2c56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MarkovChains">
+      <UniqueIdentifier>{0c525380-3ac8-49cc-aced-1aaecbd7561f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NameGenerator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AstroObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SolarSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Orbit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MathHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FastNoise.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcGen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AstroObject.cpp">
+      <Filter>Source Files\SolarSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Orbit.cpp">
+      <Filter>Source Files\SolarSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="SolarSystem.cpp">
+      <Filter>Source Files\SolarSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="NameGenerator.cpp">
+      <Filter>Source Files\MarkovChains</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Chain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MarkovChain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NameGenerator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AstroObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SolarSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Orbit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SGC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MathHelpers.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FastNoise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcGen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AstroObject.h">
+      <Filter>Header Files\SolarSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Orbit.h">
+      <Filter>Header Files\SolarSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="SolarSystem.h">
+      <Filter>Header Files\SolarSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="MarkovChain.h">
+      <Filter>Header Files\MarkovChains</Filter>
+    </ClInclude>
+    <ClInclude Include="Chain.h">
+      <Filter>Header Files\MarkovChains</Filter>
+    </ClInclude>
+    <ClInclude Include="NameGenerator.h">
+      <Filter>Header Files\MarkovChains</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
