@@ -5,42 +5,38 @@
 
 SolarSystem::SolarSystem()
 {
-	_arial.loadFromFile("Fonts\arial.ttf");
-	_nameText.setFont(_arial);
-	_nameText.setStyle(sf::Text::Regular);
-	_nameText.setCharacterSize(22);
+	
 }
 
 SolarSystem::SolarSystem(SGC sgc)
 {
-	_sgc = sgc;
-	_arial.loadFromFile("Fonts\\arial.ttf");
-	_nameText.setFont(_arial);
-	_nameText.setStyle(sf::Text::Regular);
-	_nameText.setCharacterSize(22);
+	Init(sgc);
 }
 
 SolarSystem::SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius)
 {
-	_sgc = sgc;
+	Init(sgc);
 	_center = center;
 	_maxRadius = maxRadius;
-	_arial.loadFromFile("Fonts\\arial.ttf");
-	_nameText.setFont(_arial);
-	_nameText.setStyle(sf::Text::Regular);
-	_nameText.setCharacterSize(22);
 }
 
 SolarSystem::SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius, SolarSystemConstants ssc)
 {
-	_sgc = sgc;
+	Init(sgc);
 	_center = center;
 	_maxRadius = maxRadius;
 	_ssc = ssc;
-	_arial.loadFromFile("Fonts\\arial.ttf");
-	_nameText.setFont(_arial);
+}
+
+void SolarSystem::Init(SGC sgc)
+{
+	_sgc = sgc;
+	std::string fontPath = "Fonts\\SimSun.ttf";
+	_font.loadFromFile(fontPath);
+	_nameText.setFont(_font);
 	_nameText.setStyle(sf::Text::Bold);
-	_nameText.setCharacterSize(20);
+	_nameText.setCharacterSize(22);
+	_isGenerated = false;
 }
 
 void SolarSystem::GenerateSolarSystem()
@@ -53,9 +49,10 @@ void SolarSystem::GenerateSolarSystem()
 	if (!_system.create(_sgc.WINDOW_WIDTH, _sgc.WINDOW_HEIGHT))
 	{
 		printf("Error creating render texture in SolarSystem.");
+		return;
 	}
 
-	bool ranOnce = false;
+	bool success = true;
 	int index = 0;
 
 	int randModForStar;
@@ -78,7 +75,7 @@ void SolarSystem::GenerateSolarSystem()
 	if (!GetRandMod(_star.GetRadius(), _ssc.OrbitMinPercOfStarRadius, _ssc.OrbitMaxPercOfMaxStarRadius, randModForOrbit))
 	{
 		printf("Problem when generating solar system. randMod: %d", randModForOrbit);
-		return;
+		success = false;
 	}
 	float randMinForOrbit = GetRandMin(_star.GetRadius(), _ssc.OrbitMinPercOfStarRadius);
 
@@ -90,8 +87,6 @@ void SolarSystem::GenerateSolarSystem()
 	int planetCount = (rand() % _ssc.TotalPlanetCount) + 1;
 	while (planetCount-- > 0)
 	{
-		ranOnce = true;
-
 		_planets.push_back(Planet());
 		_planets[index].Init();
 		_planets[index].SetSGC(_sgc);
@@ -99,6 +94,7 @@ void SolarSystem::GenerateSolarSystem()
 		if (!GetRandMod(_star.GetRadius(), _ssc.PlanetMinPercOfStarRadius, _ssc.PlanetMaxPercOfStarRadius, randModForPlanet))
 		{
 			printf("Problem when generating solar system. randMod: %d", randModForPlanet);
+			success = false;
 			break;
 		}
 		float randMinForPlanet = GetRandMin(_star.GetRadius(), _ssc.PlanetMinPercOfStarRadius);
@@ -112,12 +108,12 @@ void SolarSystem::GenerateSolarSystem()
 		{
 			_planets.pop_back();
 			if (_planets.empty())
-				ranOnce = false;
+				success = false;
 			break;
 		}
 		_planets[index].CreateOrbit(orbitPos, orbitRadius);
 		_planets[index].CalculatePosition();
-		_planets[index].SetColor(sf::Color::Green);
+		_planets[index].SetColor(sf::Color::Cyan);
 		prvPlanetRadius = _planets[index].GetRadius();
 
 		randMaxMod = (int)((_ssc.OrbitMaxPercGrowth * 100 - _ssc.OrbitMinPercGrowth * 100) + 1);
@@ -126,6 +122,7 @@ void SolarSystem::GenerateSolarSystem()
 		if (!GetRandMod(orbitRadius, _ssc.OrbitMinPercOfStarRadius, _ssc.OrbitMaxPercOfMaxStarRadius, randModForOrbit))
 		{
 			printf("Problem when generating solar system. randMod: %d", randModForOrbit);
+			success = false;
 			break;
 		}
 		randMinForOrbit = GetRandMin(orbitRadius, _ssc.OrbitMinPercOfStarRadius);
@@ -134,10 +131,11 @@ void SolarSystem::GenerateSolarSystem()
 		++index;
 	}
 
-	if (!ranOnce)
+	if (!success)
 	{
-		printf("No Planets were generated. Try increasing max radius.");
+		printf("Solar System Failed to Generate.");
 	}
+	_isGenerated = success;
 
 	printf("\n----------------------------------------------------------------\n");
 
@@ -167,7 +165,7 @@ void SolarSystem::Update(sf::Vector2i mousePos)
 	_star.SetColor(sf::Color::Red);
 	for (Planet& planet : _planets)
 	{
-		planet.SetColor(sf::Color::Green);
+		planet.SetColor(sf::Color::Cyan);
 	}
 
 	if (_star.IsWithin(mousePos))

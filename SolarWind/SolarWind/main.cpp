@@ -13,7 +13,7 @@ int main(int argc, char* args[])
 	srand(seed);
 
 	SGC sgc;
-	sgc.WINDOW_WIDTH = 1000;
+	sgc.WINDOW_WIDTH = 800;
 	sgc.WINDOW_HEIGHT = 800;
 	sgc.SEED = seed;
 	sgc.TIME = sf::Clock();
@@ -37,28 +37,24 @@ int main(int argc, char* args[])
 	ssc.PlanetMinPercOfStarRadius = 0.10f;
 	ssc.PlanetMaxPercOfStarRadius = 0.40f;
 
+	bool isWorldGen = false;
+
 	float radius = GetInscribedCircleRadius(sgc.WINDOW_WIDTH, sgc.WINDOW_HEIGHT);
-	SolarSystem solarSystem(sgc, sf::Vector2f(sgc.WINDOW_WIDTH / 2.0f, sgc.WINDOW_HEIGHT / 2.0f), radius, ssc);
-	solarSystem.GenerateSolarSystem();
+	sf::Vector2f center = sf::Vector2f(sgc.WINDOW_WIDTH / 2.0f, sgc.WINDOW_HEIGHT / 2.0f);
+	SolarSystem solarSystem(sgc, center, radius, ssc);
 
-	sf::Vertex vertexes1[2] =
-	{
-		sf::Vertex(sf::Vector2f(sgc.WINDOW_WIDTH / 2, 0)),
-		sf::Vertex(sf::Vector2f(sgc.WINDOW_WIDTH / 2, sgc.WINDOW_HEIGHT))
-	};
+	ProcGen procGen(sgc, sgc.WINDOW_WIDTH, sgc.WINDOW_HEIGHT);
 
-	sf::Vertex vertexes2[2] =
+	if (isWorldGen)
 	{
-		sf::Vertex(sf::Vector2f(0, sgc.WINDOW_HEIGHT / 2)),
-		sf::Vertex(sf::Vector2f(sgc.WINDOW_WIDTH, sgc.WINDOW_HEIGHT / 2))
-	};
+		procGen.Generate();
+	}
+	else
+	{
+		solarSystem.GenerateSolarSystem();
+	}
 
 	sf::Vector2i mousePos;
-
-	bool procGenScreen = false;
-	ProcGen procGen;
-	procGen.Init();
-	procGen.SetSGC(sgc);
 
 	while (window.isOpen())
 	{
@@ -70,19 +66,41 @@ int main(int argc, char* args[])
 			if (event.type == sf::Event::KeyPressed)
 			{
 				if (event.key.code == sf::Keyboard::R)
-					solarSystem.GenerateSolarSystem();
+				{
+					if (isWorldGen)
+					{
+						procGen.NewSeed(time(0));
+						procGen.Generate();
+					}
+					else
+					{
+						solarSystem.GenerateSolarSystem();
+					}
+				}
 				if (event.key.code == sf::Keyboard::S)
-					procGenScreen = !procGenScreen;
+				{
+					isWorldGen = !isWorldGen;
+					if (!isWorldGen)
+					{
+						if (!solarSystem.IsGenerated())
+						{
+							solarSystem.GenerateSolarSystem();
+						}
+					}
+					else
+					{
+						if (!procGen.IsGenerated())
+						{
+							procGen.Generate();
+						}
+					}
+				}
 			}
 		}
 
 		mousePos = sf::Mouse::getPosition(window);
 
-		if (procGenScreen)
-		{
-			procGen.DrawTexure();
-		}
-		else
+		if (!isWorldGen)
 		{
 			solarSystem.Update(mousePos);
 			solarSystem.DrawTexture();
@@ -90,11 +108,8 @@ int main(int argc, char* args[])
 
 		window.clear(sf::Color::Black);
 
-		window.draw(vertexes1, 2, sf::Lines);
-		window.draw(vertexes2, 2, sf::Lines);
-
 		sf::Sprite sprite;
-		if (procGenScreen)
+		if (isWorldGen)
 		{
 			sprite.setTexture(procGen.GetTexture());
 		}

@@ -38,7 +38,7 @@ class Planet : public AstroObject
 {
 	public:
 		Planet();
-		Planet(sf::Vector2f position, float radius, sf::Color color = sf::Color::Green);
+		Planet(sf::Vector2f position, float radius, sf::Color color = sf::Color::Cyan);
 
 		void Init();
 
