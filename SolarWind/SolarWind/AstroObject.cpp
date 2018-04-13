@@ -31,6 +31,11 @@ bool AstroObject::IsWithin(sf::Vector2i mousePos)
 	printf("diff Length: %f\n\n", diff.x * diff.x + diff.y * diff.y);*/
 	return GetRadius() * GetRadius() > diff.x * diff.x + diff.y * diff.y;
 }
+
+void AstroObject::Draw(sf::RenderTarget* target)
+{
+	target->draw(_body);
+}
 //End of AstroObject
 
 //Planet Class
@@ -50,6 +55,7 @@ Planet::Planet(sf::Vector2f position, float radius, sf::Color color)
 void Planet::Init()
 {
 	GenerateName();
+	_orbit.Init();
 }
 
 void Planet::CreateOrbit(sf::Vector2f orbitPos, float orbitRadius)
@@ -86,6 +92,12 @@ void Planet::GenerateName()
 	IsNewName() = planetNameGen.IsNewName(planetName);
 	SetName(planetName);
 	printf("%s %s\n", (IsNewName() ? "New:" : "Not:"), planetName.c_str());
+}
+
+void Planet::Draw(sf::RenderTarget* target)
+{
+	_orbit.Draw(target);
+	AstroObject::Draw(target);
 }
 //End Planet Class
 

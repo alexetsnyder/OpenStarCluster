@@ -33,9 +33,9 @@ class SolarSystem
 
 		void GenerateSolarSystem();
 
-		void DrawTexture();
-		const sf::Texture& GetTexture();
+		void CreateSprite();
 		void Update(sf::Vector2i mousePos);
+		void Draw(sf::RenderTarget* target);
 
 		bool IsGenerated() { return _isGenerated; }
 
@@ -46,6 +46,7 @@ class SolarSystem
 
 	private:
 		void SimulatePlanets();
+		sf::Vector2f GetTextPosition(sf::Vector2i mousePos);
 
 		SGC _sgc;
 		SolarSystemConstants _ssc;
@@ -53,9 +54,12 @@ class SolarSystem
 		sf::Text _nameText;
 		bool _isGenerated;
 		float _maxRadius;
+		unsigned int _seed;
+		std::mt19937 _mTwistRand;
 		sf::Vector2f _center;
 		Star _star;
 		std::vector<Planet> _planets;
+		sf::Sprite _spriteSystem;
 		sf::RenderTexture _system;
 };
 

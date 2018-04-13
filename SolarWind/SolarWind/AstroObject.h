@@ -12,6 +12,7 @@ class AstroObject
 		AstroObject(sf::Vector2f position, float radius, sf::Color color);
 
 		bool IsWithin(sf::Vector2i mousePos);
+		virtual void Draw(sf::RenderTarget* target);
 
 		void SetPosition(sf::Vector2f position) { _body.setPosition(position); }
 		void SetRadius(float radius) { _body.setRadius(radius); }
@@ -46,7 +47,7 @@ class Planet : public AstroObject
 		void UpdateOrbit();
 		void CalculatePosition();
 
-		sf::CircleShape GetOrbit() { return _orbit.GetOrbit(); }
+		void Draw(sf::RenderTarget* target);
 
 		void SetOrbitRadius(float radius) { _orbit.SetRadius(radius); }
 		void SetOrbitPosition(sf::Vector2f position) { _orbit.SetPosition(position); }

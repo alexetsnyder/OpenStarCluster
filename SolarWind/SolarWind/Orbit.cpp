@@ -6,24 +6,25 @@
 
 Orbit::Orbit()
 {
-	_orbit.setPointCount(100);
-	_orbit.setFillColor(sf::Color::Transparent);
-	_orbit.setOutlineThickness(-1.0f);
-	float degreeAngle = rand() % 361;
-	_angle = degreeAngle * (2*PI / 360.0f);
-	//_angle = 0.0f;
+	
 }
 
 Orbit::Orbit(sf::Vector2f position, float radius, sf::Color color)
 {
-	_orbit.setPointCount(100);
-	_orbit.setFillColor(sf::Color::Transparent);
-	_orbit.setOutlineThickness(-1.0f);
 	_orbit.setPosition(position);
 	_orbit.setOutlineColor(color);
 	_orbit.setRadius(radius);
+	Init();
+}
+
+void Orbit::Init()
+{
+	_orbit.setPointCount(100);
+	_orbit.setFillColor(sf::Color::Transparent);
+	_orbit.setOutlineThickness(-1.0f);
 	float degreeAngle = rand() % 361;
 	_angle = degreeAngle * (2 * PI / 360.0f);
+	//_angle = PI / 2.0f;
 }
 
 void Orbit::CalculateNextOrbitAngle(sf::Time elapsed)
@@ -39,4 +40,9 @@ sf::Vector2f Orbit::GetOrbitPosition()
 	float xPos = GetRadius() * std::cos(_angle) + orbitPos.x + GetRadius();
 	float yPos = GetRadius() * std::sin(_angle) + orbitPos.y + GetRadius();
 	return sf::Vector2f(xPos, yPos);
+}
+
+void Orbit::Draw(sf::RenderTarget* target)
+{
+	target->draw(_orbit);
 }

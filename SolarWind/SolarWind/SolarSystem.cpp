@@ -26,6 +26,9 @@ SolarSystem::SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius, SolarSys
 	_center = center;
 	_maxRadius = maxRadius;
 	_ssc = ssc;
+	std::random_device device;
+	_seed = device();
+	std::mt19937 mTwistRand(_seed);
 }
 
 void SolarSystem::Init(SGC sgc)
@@ -141,22 +144,22 @@ void SolarSystem::GenerateSolarSystem()
 
 }
 
-void SolarSystem::DrawTexture()
+void SolarSystem::CreateSprite()
 {
 	_system.clear(sf::Color::Black);
-	_system.draw(_star.GetObject());
+	_star.Draw(&_system);
 	for (Planet& planet : _planets)
 	{
-		_system.draw(planet.GetOrbit());
-		_system.draw(planet.GetObject());
+		planet.Draw(&_system);
 	}
 	_system.draw(_nameText);	
 	_system.display();
+	_spriteSystem.setTexture(_system.getTexture());
 }
 
-const sf::Texture& SolarSystem::GetTexture()
+void SolarSystem::Draw(sf::RenderTarget* target)
 {
-	return _system.getTexture();
+	target->draw(_spriteSystem);
 }
 
 void SolarSystem::Update(sf::Vector2i mousePos)
@@ -171,9 +174,9 @@ void SolarSystem::Update(sf::Vector2i mousePos)
 	if (_star.IsWithin(mousePos))
 	{
 		_star.SetColor(sf::Color::Blue);
-		_nameText.setPosition(mousePos.x + 5.0f, mousePos.y);
+		_nameText.setString(_star.GetName());		
+		_nameText.setPosition(GetTextPosition(mousePos));
 		_nameText.setFillColor((_star.IsNewName()) ? sf::Color::Green : sf::Color::Yellow);
-		_nameText.setString(_star.GetName());
 	}
 	else
 	{
@@ -182,9 +185,9 @@ void SolarSystem::Update(sf::Vector2i mousePos)
 			if (planet.IsWithin(mousePos))
 			{
 				planet.SetColor(sf::Color::Blue);
-				_nameText.setPosition(mousePos.x + 5.0f, mousePos.y);
-				_nameText.setFillColor((planet.IsNewName()) ? sf::Color::Green : sf::Color::Yellow);
 				_nameText.setString(planet.GetName());
+				_nameText.setPosition(GetTextPosition(mousePos));
+				_nameText.setFillColor((planet.IsNewName()) ? sf::Color::Green : sf::Color::Yellow);
 			}
 		}
 	}
@@ -199,4 +202,21 @@ void SolarSystem::SimulatePlanets()
 		planet.UpdateOrbit();
 		planet.CalculatePosition();
 	}
+}
+
+sf::Vector2f SolarSystem::GetTextPosition(sf::Vector2i mousePos)
+{
+	sf::Vector2f retVector(mousePos.x + 5.0f, mousePos.y - 5.0f);
+
+	if (mousePos.x + _nameText.getLocalBounds().width > _sgc.WINDOW_WIDTH)
+	{
+		retVector.x += -5.0f - _nameText.getLocalBounds().width;
+	}
+
+	if (mousePos.y + _nameText.getLocalBounds().height > _sgc.WINDOW_HEIGHT)
+	{
+		retVector.y += -5.0f - _nameText.getLocalBounds().height;
+	}
+
+	return retVector;
 }

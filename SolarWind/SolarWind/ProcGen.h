@@ -11,9 +11,10 @@ class ProcGen
 		void Init(SGC sgc, int width = 1000, int height = 800);
 
 		void Generate();
-		const sf::Texture& GetTexture() { return _generated; }
+		void Draw(sf::RenderTarget* target);
 
 		bool IsGenerated() { return _isGenerated; }
+		sf::Uint8 Clamp(float noise);
 
 		void SetSGC(SGC sgc) { _sgc = sgc; }
 		void NewSeed(unsigned int seed) { _fastNoise.SetSeed(seed); }
@@ -24,5 +25,6 @@ class ProcGen
 		int _height;
 		bool _isGenerated;
 		sf::Texture _generated;
+		sf::Sprite _spriteGen;
 		FastNoise _fastNoise;
 };

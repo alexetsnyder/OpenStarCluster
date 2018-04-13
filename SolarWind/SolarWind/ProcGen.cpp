@@ -34,17 +34,28 @@ void ProcGen::Generate()
 	{
 		for (int j = 0; j < _height; ++j)
 		{
-			float height = (_fastNoise.GetNoise(i, j) + 1) / 2.0f * 255.0f;
+			sf::Uint8 color = Clamp((_fastNoise.GetNoise(i, j) + 1) /2);
 			int index = 4 * (i * _height + j);
-			pixels[index] = height;
-			pixels[index + 1] = height;
-			pixels[index + 2] = height;
+			pixels[index] = color;
+			pixels[index + 1] = color;
+			pixels[index + 2] = color;
 			pixels[index + 3] = 255;
 		}
 	}
 	
 	_generated.update(pixels);
+	_spriteGen.setTexture(_generated);
 	delete[] pixels;
 
 	_isGenerated = true;
+}
+
+sf::Uint8 ProcGen::Clamp(float noise)
+{
+	return (noise >= 1.0f) ? 255 : (noise <= 0.0f) ? 0 : static_cast<sf::Uint8>(noise * 255.0f + 0.5f);
+}
+
+void ProcGen::Draw(sf::RenderTarget* target)
+{
+	target->draw(_spriteGen);
 }

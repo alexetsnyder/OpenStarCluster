@@ -28,8 +28,6 @@ class MarkovChain
 template <class chunkT, class keyT>
 MarkovChain<chunkT, keyT>::MarkovChain(int order)
 {
-	std::srand(time(0));
-
 	_order = order;
 	_chain = Chain<keyT>(0, order);
 }
