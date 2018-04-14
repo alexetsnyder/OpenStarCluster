@@ -26,14 +26,14 @@ class SolarSystem
 {
 	public:
 		SolarSystem();
-		SolarSystem(SGC sgc);
+		//SolarSystem(SGC sgc);
 		SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius);
 		SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius, SolarSystemConstants ssc);
 		void Init(SGC sgc);
 
 		void GenerateSolarSystem();
 
-		void CreateSprite();
+		void CreateTexture();
 		void Update(sf::Vector2i mousePos);
 		void Draw(sf::RenderTarget* target);
 

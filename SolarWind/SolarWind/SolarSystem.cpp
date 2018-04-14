@@ -8,27 +8,27 @@ SolarSystem::SolarSystem()
 	
 }
 
-SolarSystem::SolarSystem(SGC sgc)
-{
-	Init(sgc);
-}
+//SolarSystem::SolarSystem(SGC sgc)
+//{
+//	Init(sgc);
+//}
 
 SolarSystem::SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius)
 {
-	Init(sgc);
 	_center = center;
 	_maxRadius = maxRadius;
+	Init(sgc);
 }
 
 SolarSystem::SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius, SolarSystemConstants ssc)
 {
-	Init(sgc);
 	_center = center;
 	_maxRadius = maxRadius;
 	_ssc = ssc;
 	std::random_device device;
 	_seed = device();
 	std::mt19937 mTwistRand(_seed);
+	Init(sgc);
 }
 
 void SolarSystem::Init(SGC sgc)
@@ -40,6 +40,12 @@ void SolarSystem::Init(SGC sgc)
 	_nameText.setStyle(sf::Text::Bold);
 	_nameText.setCharacterSize(22);
 	_isGenerated = false;
+
+	if (!_system.create(_maxRadius, _maxRadius))
+	{
+		printf("Error creating render texture in SolarSystem.");
+	}
+	_spriteSystem.setTexture(_system.getTexture());
 }
 
 void SolarSystem::GenerateSolarSystem()
@@ -47,12 +53,6 @@ void SolarSystem::GenerateSolarSystem()
 	if (!_planets.empty())
 	{
 		_planets.clear();
-	}
-
-	if (!_system.create(_sgc.WINDOW_WIDTH, _sgc.WINDOW_HEIGHT))
-	{
-		printf("Error creating render texture in SolarSystem.");
-		return;
 	}
 
 	bool success = true;
@@ -144,7 +144,7 @@ void SolarSystem::GenerateSolarSystem()
 
 }
 
-void SolarSystem::CreateSprite()
+void SolarSystem::CreateTexture()
 {
 	_system.clear(sf::Color::Black);
 	_star.Draw(&_system);
@@ -154,7 +154,7 @@ void SolarSystem::CreateSprite()
 	}
 	_system.draw(_nameText);	
 	_system.display();
-	_spriteSystem.setTexture(_system.getTexture());
+	
 }
 
 void SolarSystem::Draw(sf::RenderTarget* target)
@@ -208,12 +208,12 @@ sf::Vector2f SolarSystem::GetTextPosition(sf::Vector2i mousePos)
 {
 	sf::Vector2f retVector(mousePos.x + 5.0f, mousePos.y - 5.0f);
 
-	if (mousePos.x + _nameText.getLocalBounds().width > _sgc.WINDOW_WIDTH)
+	if (mousePos.x + _nameText.getLocalBounds().width > _maxRadius)
 	{
 		retVector.x += -5.0f - _nameText.getLocalBounds().width;
 	}
 
-	if (mousePos.y + _nameText.getLocalBounds().height > _sgc.WINDOW_HEIGHT)
+	if (mousePos.y + _nameText.getLocalBounds().height > _maxRadius)
 	{
 		retVector.y += -5.0f - _nameText.getLocalBounds().height;
 	}

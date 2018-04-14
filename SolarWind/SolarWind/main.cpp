@@ -103,7 +103,7 @@ int main(int argc, char* args[])
 		if (!isWorldGen)
 		{
 			solarSystem.Update(mousePos);
-			solarSystem.CreateSprite();
+			solarSystem.CreateTexture();
 		}
 
 		window.clear(sf::Color::Black);

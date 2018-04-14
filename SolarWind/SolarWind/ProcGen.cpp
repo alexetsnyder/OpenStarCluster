@@ -18,16 +18,16 @@ void ProcGen::Init(SGC sgc, int width, int height)
 	_fastNoise.SetFractalOctaves(18);
 	_width = width;
 	_height = height;
+
+	if (!_generated.create(_width, _height))
+	{
+		printf("Error creating texture in ProcGen.");
+	}
+	_spriteGen.setTexture(_generated);
 }
 
 void ProcGen::Generate()
 {
-	if (!_generated.create(_width, _height))
-	{
-		printf("Error creating texture in ProcGen.");
-		return;
-	}
-
 	sf::Uint8* pixels = new sf::Uint8[_width * _height * 4];
 
 	for (int i = 0; i < _width; ++i)
@@ -44,7 +44,6 @@ void ProcGen::Generate()
 	}
 	
 	_generated.update(pixels);
-	_spriteGen.setTexture(_generated);
 	delete[] pixels;
 
 	_isGenerated = true;
