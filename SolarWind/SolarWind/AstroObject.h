@@ -43,7 +43,7 @@ class Planet : public AstroObject
 
 		void Init();
 
-		void CreateOrbit(sf::Vector2f orbitPos, float orbitRadius);
+		void CreateOrbit(std::mt19937 engine, sf::Vector2f orbitPos, float orbitRadius);
 		void UpdateOrbit();
 		void CalculatePosition();
 

@@ -11,13 +11,13 @@ NameGenerator::NameGenerator()
 
 NameGenerator::NameGenerator(string fileName, int order)
 {
-	_markovChain = MarkovChain<string, char>(order);
+	_markovChain.Init(order);
 	LoadDataFromFile(fileName);
 }
 
 void NameGenerator::Init(int order)
 {
-	_markovChain = MarkovChain<string, char>(order);
+	_markovChain.Init(order);
 }
 
 void NameGenerator::LoadDataFromFile(string fileName)

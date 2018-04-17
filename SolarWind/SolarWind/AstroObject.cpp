@@ -54,15 +54,16 @@ Planet::Planet(sf::Vector2f position, float radius, sf::Color color)
 
 void Planet::Init()
 {
-	GenerateName();
-	_orbit.Init();
+	GenerateName();	
 }
 
-void Planet::CreateOrbit(sf::Vector2f orbitPos, float orbitRadius)
+void Planet::CreateOrbit(std::mt19937 engine, sf::Vector2f orbitPos, float orbitRadius)
 {
+	_orbit.Init(GetSGC());
 	_orbit.SetRadius(orbitRadius);
 	_orbit.SetPosition(sf::Vector2f(orbitPos.x, orbitPos.y));
 	_orbit.SetVelocity(0.00005f);
+	_orbit.CalculateOrbitAngle(engine);
 }
 
 void Planet::UpdateOrbit()

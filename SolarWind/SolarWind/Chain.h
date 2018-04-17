@@ -6,7 +6,9 @@ template <class Type>
 class Chain
 {
 	public:
-		Chain(int depth=0, int maxDepth=1);
+		Chain();
+		Chain(int depth, int maxDepth);
+		void Init(int depth, int maxDepth = 1);
 
 		bool Contains(Type key);
 		bool IsLastLink();
@@ -24,7 +26,19 @@ class Chain
 };
 
 template <class Type>
+Chain<Type>::Chain()
+{
+
+}
+
+template <class Type>
 Chain<Type>::Chain(int depth, int maxDepth)
+{
+	Init(depth, maxDepth);
+}
+
+template <class Type>
+void Chain<Type>::Init(int depth, int maxDepth)
 {
 	_depth = depth;
 	_maxDepth = maxDepth;

@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <random>
 #include <time.h>
 #include "SGC.h"
 #include "NameGenerator.h"
@@ -9,8 +10,9 @@
 
 int main(int argc, char* args[])
 {
-	unsigned int seed = time(0);
-	srand(seed);
+	std::random_device device;
+	unsigned int seed = device();
+	std::mt19937 engine(seed);
 
 	SGC sgc;
 	sgc.WINDOW_WIDTH = 800;
@@ -25,16 +27,15 @@ int main(int argc, char* args[])
 	sf::RenderWindow window(sf::VideoMode(sgc.WINDOW_WIDTH, sgc.WINDOW_HEIGHT), "Solar Wind!");
 	
 	SolarSystemConstants ssc;
-	ssc.RadiusPadding = 0.0f;
 	ssc.PlanetPadding = 0.0f;
 	ssc.TotalPlanetCount = 12;
-	ssc.StarMinPercOfMaxSize = 0.01f;
+	ssc.StarMinPercOfMaxSize = 0.05f;
 	ssc.StarMaxPercOfMaxSize = 0.10f;
-	ssc.OrbitMinPercGrowth = 0.10f;
-	ssc.OrbitMaxPercGrowth = 0.60f;
-	ssc.OrbitMinPercOfStarRadius = 0.01f;
-	ssc.OrbitMaxPercOfMaxStarRadius = 0.40f;
-	ssc.PlanetMinPercOfStarRadius = 0.10f;
+	ssc.OrbitMinPercGrowth = 0.01f;
+	ssc.OrbitMaxPercGrowth = 0.05f;
+	ssc.OrbitMinPercOfStarRadius = 0.05f;
+	ssc.OrbitMaxPercOfStarRadius = 0.20f;
+	ssc.PlanetMinPercOfStarRadius = 0.20f;
 	ssc.PlanetMaxPercOfStarRadius = 0.40f;
 
 	bool isWorldGen = false;
@@ -51,7 +52,7 @@ int main(int argc, char* args[])
 	}
 	else
 	{
-		solarSystem.GenerateSolarSystem();
+		solarSystem.GenerateSolarSystem(engine);
 	}
 
 	sf::Vector2i mousePos;
@@ -74,7 +75,7 @@ int main(int argc, char* args[])
 					}
 					else
 					{
-						solarSystem.GenerateSolarSystem();
+						solarSystem.GenerateSolarSystem(engine);
 					}
 				}
 				if (event.key.code == sf::Keyboard::S)
@@ -84,7 +85,7 @@ int main(int argc, char* args[])
 					{
 						if (!solarSystem.IsGenerated())
 						{
-							solarSystem.GenerateSolarSystem();
+							solarSystem.GenerateSolarSystem(engine);
 						}
 					}
 					else

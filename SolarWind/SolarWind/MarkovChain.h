@@ -3,14 +3,15 @@
 #include <vector>
 #include <deque>
 #include <random>
-#include <time.h>
 #include "Chain.h"
 
 template <class chunkT, class keyT>
 class MarkovChain
 {
 	public:
-		MarkovChain(int order=1);
+		MarkovChain();
+		MarkovChain(int order);
+		void Init(int order);
 		
 		bool CreateFrequencyTable(std::vector<chunkT> chunks);
 		bool GenerateNewChunk(int minLength, int maxLength, chunkT& outChunk);
@@ -21,15 +22,30 @@ class MarkovChain
 		bool AddKeys(std::deque<keyT> keys);
 
 		int _order;
+		std::mt19937 _engine;
 		Chain<keyT> _chain;
 		std::vector<keyT> _keys;
 };
 
 template <class chunkT, class keyT>
+MarkovChain<chunkT, keyT>::MarkovChain()
+{
+
+}
+
+template <class chunkT, class keyT>
 MarkovChain<chunkT, keyT>::MarkovChain(int order)
 {
+	Init(order);
+}
+
+template <class chunkT, class keyT>
+void MarkovChain<chunkT, keyT>::Init(int order)
+{
 	_order = order;
-	_chain = Chain<keyT>(0, order);
+	_chain.Init(0, order);
+	std::random_device device;
+	_engine = std::mt19937(device());
 }
 
 template <class chunkT, class keyT>
@@ -174,7 +190,8 @@ bool MarkovChain<chunkT, keyT>::GetNextKey(std::deque<keyT> keys, keyT& outKey)
 
 	if (total > 0)
 	{
-		int metric = (rand() % total) + 1;
+		std::uniform_int_distribution<int> uid(1, total);
+		int metric = uid(_engine);
 
 		total = 0;
 		for (map<keyT, int>::value_type& value : distribution)

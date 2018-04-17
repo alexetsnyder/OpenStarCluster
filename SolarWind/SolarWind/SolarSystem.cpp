@@ -8,11 +8,6 @@ SolarSystem::SolarSystem()
 	
 }
 
-//SolarSystem::SolarSystem(SGC sgc)
-//{
-//	Init(sgc);
-//}
-
 SolarSystem::SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius)
 {
 	_center = center;
@@ -25,9 +20,6 @@ SolarSystem::SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius, SolarSys
 	_center = center;
 	_maxRadius = maxRadius;
 	_ssc = ssc;
-	std::random_device device;
-	_seed = device();
-	std::mt19937 mTwistRand(_seed);
 	Init(sgc);
 }
 
@@ -48,7 +40,7 @@ void SolarSystem::Init(SGC sgc)
 	_spriteSystem.setTexture(_system.getTexture());
 }
 
-void SolarSystem::GenerateSolarSystem()
+void SolarSystem::GenerateSolarSystem(std::mt19937& engine)
 {
 	if (!_planets.empty())
 	{
@@ -58,55 +50,36 @@ void SolarSystem::GenerateSolarSystem()
 	bool success = true;
 	int index = 0;
 
-	int randModForStar;
-	if (!GetRandMod(_maxRadius, _ssc.StarMinPercOfMaxSize, _ssc.StarMaxPercOfMaxSize, randModForStar))
-	{
-		printf("Problem when generating solar system. randMod: %d", randModForStar);
-		return;
-	}
-	float randMinForStar = GetRandMin(_maxRadius, _ssc.StarMinPercOfMaxSize);
-
+	std::uniform_int_distribution<int> starUID(_ssc.StarMinPercOfMaxSize * _maxRadius, _ssc.StarMaxPercOfMaxSize * _maxRadius);
+	
 	_star = Star();
 	_star.Init();
 	_star.SetSGC(_sgc);
-	_star.SetRadius((rand() % randModForStar) + randMinForStar);
+	_star.SetRadius(starUID(engine));
 	_star.SetPosition(sf::Vector2f(_center.x - _star.GetRadius(), _center.y - _star.GetRadius()));
 	_star.SetColor(sf::Color::Red);
+
 	float currentRadius = _star.GetRadius();
-
-	int randModForOrbit;
-	if (!GetRandMod(_star.GetRadius(), _ssc.OrbitMinPercOfStarRadius, _ssc.OrbitMaxPercOfMaxStarRadius, randModForOrbit))
-	{
-		printf("Problem when generating solar system. randMod: %d", randModForOrbit);
-		success = false;
-	}
-	float randMinForOrbit = GetRandMin(_star.GetRadius(), _ssc.OrbitMinPercOfStarRadius);
-
-	int randMaxMod = (int)((_ssc.OrbitMaxPercGrowth * 100 - _ssc.OrbitMinPercGrowth * 100) + 1);
-	float randPercGrowth = ((rand() % randMaxMod) + _ssc.OrbitMinPercGrowth * 100) / 100.0f;
-	float minPerc = _ssc.OrbitMinPercOfStarRadius + randPercGrowth;
-
+	float minPerc = _ssc.OrbitMinPercOfStarRadius;
+	float maxPerc = _ssc.OrbitMaxPercOfStarRadius;
 	float prvPlanetRadius = 0.0f;
-	int planetCount = (rand() % _ssc.TotalPlanetCount) + 1;
+
+	std::uniform_int_distribution<int> planetCountUID(1, _ssc.TotalPlanetCount);
+	int planetCount = planetCountUID(engine);
+
 	while (planetCount-- > 0)
 	{
+		std::uniform_int_distribution<int> planetUID(_ssc.PlanetMinPercOfStarRadius * _star.GetRadius(), _ssc.PlanetMaxPercOfStarRadius * _star.GetRadius());
+		std::uniform_int_distribution<int> orbitUID(minPerc * currentRadius, maxPerc * currentRadius);
+
 		_planets.push_back(Planet());
 		_planets[index].Init();
 		_planets[index].SetSGC(_sgc);
-		int randModForPlanet;
-		if (!GetRandMod(_star.GetRadius(), _ssc.PlanetMinPercOfStarRadius, _ssc.PlanetMaxPercOfStarRadius, randModForPlanet))
-		{
-			printf("Problem when generating solar system. randMod: %d", randModForPlanet);
-			success = false;
-			break;
-		}
-		float randMinForPlanet = GetRandMin(_star.GetRadius(), _ssc.PlanetMinPercOfStarRadius);
-		_planets[index].SetRadius((rand() % randModForPlanet) + randMinForPlanet);
+		_planets[index].SetRadius(planetUID(engine));
 
-		float orbitRadius = (rand() % randModForOrbit) + randMinForOrbit;
+		float orbitRadius = orbitUID(engine);
 		orbitRadius += currentRadius + prvPlanetRadius + _planets[index].GetRadius() + _ssc.PlanetPadding;
 		sf::Vector2f orbitPos(_center.x - orbitRadius, _center.y - orbitRadius);
-
 		if (2 * orbitRadius > _maxRadius)
 		{
 			_planets.pop_back();
@@ -114,21 +87,16 @@ void SolarSystem::GenerateSolarSystem()
 				success = false;
 			break;
 		}
-		_planets[index].CreateOrbit(orbitPos, orbitRadius);
+
+		_planets[index].CreateOrbit(engine, orbitPos, orbitRadius);
 		_planets[index].CalculatePosition();
 		_planets[index].SetColor(sf::Color::Cyan);
 		prvPlanetRadius = _planets[index].GetRadius();
 
-		randMaxMod = (int)((_ssc.OrbitMaxPercGrowth * 100 - _ssc.OrbitMinPercGrowth * 100) + 1);
-		randPercGrowth = ((rand() % randMaxMod) + _ssc.OrbitMinPercGrowth * 100) / 100.0f;
-		minPerc += randPercGrowth;
-		if (!GetRandMod(orbitRadius, _ssc.OrbitMinPercOfStarRadius, _ssc.OrbitMaxPercOfMaxStarRadius, randModForOrbit))
-		{
-			printf("Problem when generating solar system. randMod: %d", randModForOrbit);
-			success = false;
-			break;
-		}
-		randMinForOrbit = GetRandMin(orbitRadius, _ssc.OrbitMinPercOfStarRadius);
+		std::uniform_int_distribution<int> percUID((int)(_ssc.OrbitMinPercGrowth * 100), (int)(_ssc.OrbitMaxPercGrowth * 100));
+		float percGrowth = percUID(engine) / 100.0f;
+		minPerc += percGrowth;
+		maxPerc += percGrowth;
 
 		currentRadius = orbitRadius;
 		++index;

@@ -6,7 +6,6 @@
 
 struct SolarSystemConstants
 {
-	float RadiusPadding;
 	float PlanetPadding;
 	int TotalPlanetCount;
 
@@ -14,7 +13,7 @@ struct SolarSystemConstants
 	float StarMaxPercOfMaxSize;
 
 	float OrbitMinPercOfStarRadius;
-	float OrbitMaxPercOfMaxStarRadius;
+	float OrbitMaxPercOfStarRadius;
 	float OrbitMinPercGrowth;
 	float OrbitMaxPercGrowth;
 
@@ -26,12 +25,11 @@ class SolarSystem
 {
 	public:
 		SolarSystem();
-		//SolarSystem(SGC sgc);
 		SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius);
 		SolarSystem(SGC sgc, sf::Vector2f center, float maxRadius, SolarSystemConstants ssc);
 		void Init(SGC sgc);
 
-		void GenerateSolarSystem();
+		void GenerateSolarSystem(std::mt19937& engine);
 
 		void CreateTexture();
 		void Update(sf::Vector2i mousePos);
@@ -54,8 +52,6 @@ class SolarSystem
 		sf::Text _nameText;
 		bool _isGenerated;
 		float _maxRadius;
-		unsigned int _seed;
-		std::mt19937 _mTwistRand;
 		sf::Vector2f _center;
 		Star _star;
 		std::vector<Planet> _planets;

@@ -1,15 +1,18 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <random>
+#include "SGC.h"
 
 class Orbit
 {
 	public:
 		Orbit();
-		Orbit(sf::Vector2f position, float radius, sf::Color color = sf::Color::White);
-		void Init();
+		Orbit(SGC sgc, sf::Vector2f position, float radius, sf::Color color = sf::Color::White);
+		void Init(SGC sgc);
 
 		void Draw(sf::RenderTarget* target);
 
+		void CalculateOrbitAngle(std::mt19937& engine);
 		void CalculateNextOrbitAngle(sf::Time elapsed);
 		sf::Vector2f GetOrbitPosition();
 
@@ -21,9 +24,13 @@ class Orbit
 		sf::Vector2f GetPosition() { return _orbit.getPosition(); }
 		float GetRadius() { return _orbit.getRadius(); }
 		sf::Color GetColor() { return _orbit.getOutlineColor(); }
+		
 
 	private:
+		SGC _sgc;
 		float _angle;
-		sf::CircleShape _orbit;
 		float _velocity;
+		std::mt19937 _engine;
+		sf::CircleShape _orbit;
+		std::uniform_int_distribution<int> _degreeUID;
 };
