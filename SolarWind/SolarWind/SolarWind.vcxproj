@@ -136,20 +136,21 @@
     <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="NameGenerator.cpp" />
     <ClCompile Include="Orbit.cpp" />
-    <ClCompile Include="ProcGen.cpp" />
     <ClCompile Include="SolarSystem.cpp" />
+    <ClCompile Include="WorldGen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AstroObject.h" />
     <ClInclude Include="Chain.h" />
+    <ClInclude Include="Color.h" />
     <ClInclude Include="FastNoise.h" />
     <ClInclude Include="MarkovChain.h" />
     <ClInclude Include="MathHelpers.h" />
     <ClInclude Include="NameGenerator.h" />
     <ClInclude Include="Orbit.h" />
-    <ClInclude Include="ProcGen.h" />
     <ClInclude Include="SGC.h" />
     <ClInclude Include="SolarSystem.h" />
+    <ClInclude Include="WorldGen.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Names\exoplanet_names.txt" />

@@ -31,6 +31,12 @@
     <Filter Include="Source Files\MarkovChains">
       <UniqueIdentifier>{0c525380-3ac8-49cc-aced-1aaecbd7561f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\WorldGen">
+      <UniqueIdentifier>{7c82c64f-2f9c-4cec-8c38-125baa31977a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\WorldGen">
+      <UniqueIdentifier>{53f666d8-9134-4295-af88-4f998cd4a776}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -40,9 +46,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FastNoise.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ProcGen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AstroObject.cpp">
@@ -57,6 +60,9 @@
     <ClCompile Include="NameGenerator.cpp">
       <Filter>Source Files\MarkovChains</Filter>
     </ClCompile>
+    <ClCompile Include="WorldGen.cpp">
+      <Filter>Source Files\WorldGen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SGC.h">
@@ -66,9 +72,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FastNoise.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ProcGen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AstroObject.h">
@@ -88,6 +91,12 @@
     </ClInclude>
     <ClInclude Include="NameGenerator.h">
       <Filter>Header Files\MarkovChains</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldGen.h">
+      <Filter>Header Files\WorldGen</Filter>
+    </ClInclude>
+    <ClInclude Include="Color.h">
+      <Filter>Header Files\WorldGen</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -6,7 +6,7 @@
 #include "NameGenerator.h"
 #include "SolarSystem.h"
 #include "MathHelpers.h"
-#include "ProcGen.h"
+#include "WorldGen.h"
 
 int main(int argc, char* args[])
 {
@@ -38,17 +38,17 @@ int main(int argc, char* args[])
 	ssc.PlanetMinPercOfStarRadius = 0.20f;
 	ssc.PlanetMaxPercOfStarRadius = 0.40f;
 
-	bool isWorldGen = false;
+	bool isWorldGen = true;
 
 	float radius = GetInscribedCircleRadius(sgc.WINDOW_WIDTH, sgc.WINDOW_HEIGHT);
 	sf::Vector2f center = sf::Vector2f(sgc.WINDOW_WIDTH / 2.0f, sgc.WINDOW_HEIGHT / 2.0f);
 	SolarSystem solarSystem(sgc, center, radius, ssc);
 
-	ProcGen procGen(sgc, sgc.WINDOW_WIDTH, sgc.WINDOW_HEIGHT);
+	WorldGen world(sgc, sgc.WINDOW_WIDTH, sgc.WINDOW_HEIGHT);
 
 	if (isWorldGen)
 	{
-		procGen.Generate();
+		world.Generate();
 	}
 	else
 	{
@@ -70,8 +70,8 @@ int main(int argc, char* args[])
 				{
 					if (isWorldGen)
 					{
-						procGen.NewSeed(time(0));
-						procGen.Generate();
+						world.NewSeed(time(0));
+						world.Generate();
 					}
 					else
 					{
@@ -90,11 +90,15 @@ int main(int argc, char* args[])
 					}
 					else
 					{
-						if (!procGen.IsGenerated())
+						if (!world.IsGenerated())
 						{
-							procGen.Generate();
+							world.Generate();
 						}
 					}
+				}
+				if (event.key.code == sf::Keyboard::Tab)
+				{
+					world.ToggleGreyScale();
 				}
 			}
 		}
@@ -111,7 +115,7 @@ int main(int argc, char* args[])
 
 		if (isWorldGen)
 		{
-			procGen.Draw(&window);
+			world.Draw(&window);
 		}
 		else
 		{
