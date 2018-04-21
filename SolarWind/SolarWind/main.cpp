@@ -55,7 +55,12 @@ int main(int argc, char* args[])
 		solarSystem.GenerateSolarSystem(engine);
 	}
 
+	sf::View worldView(sf::FloatRect(0, 0, 800, 800));
+
 	sf::Vector2i mousePos;
+
+	bool MoveWorld = false;
+	sf::Vector2f prvMousePos(0.0f, 0.0f);
 
 	while (window.isOpen())
 	{
@@ -64,14 +69,17 @@ int main(int argc, char* args[])
 		{
 			if (event.type == sf::Event::Closed)
 				window.close();
+			if (event.type == sf::Event::Resized)
+			{
+				worldView.reset(sf::FloatRect(0, 0, event.size.width, event.size.height));
+			}
 			if (event.type == sf::Event::KeyPressed)
 			{
 				if (event.key.code == sf::Keyboard::R)
 				{
 					if (isWorldGen)
 					{
-						world.NewSeed(time(0));
-						world.Generate();
+						//world.Generate();
 					}
 					else
 					{
@@ -92,7 +100,7 @@ int main(int argc, char* args[])
 					{
 						if (!world.IsGenerated())
 						{
-							world.Generate();
+							//world.Generate();
 						}
 					}
 				}
@@ -101,11 +109,43 @@ int main(int argc, char* args[])
 					world.ToggleGreyScale();
 				}
 			}
+			if (event.type == sf::Event::MouseButtonPressed)
+			{
+				sf::Vector2f worldPos = window.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
+				printf("x: %.0f y: %.0f\n", worldPos.x, worldPos.y);
+				prvMousePos.x = event.mouseButton.x;
+				prvMousePos.y = event.mouseButton.y;
+				MoveWorld = true;
+			}
+			if (event.type == sf::Event::MouseButtonReleased)
+			{
+				if (isWorldGen)
+				{
+					world.LoadChunks(worldView.getCenter());
+				}
+				MoveWorld = false;
+			}
 		}
 
 		mousePos = sf::Mouse::getPosition(window);
 
-		if (!isWorldGen)
+		if (MoveWorld)
+		{
+			float x = prvMousePos.x - mousePos.x;
+			float y = prvMousePos.y - mousePos.y;
+			worldView.move(x, y);
+
+			prvMousePos.x = mousePos.x;
+			prvMousePos.y = mousePos.y;
+		}
+
+		window.setView(worldView);
+
+		if (isWorldGen)
+		{
+			world.Update(worldView.getCenter());
+		}
+		else 
 		{
 			solarSystem.Update(mousePos);
 			solarSystem.CreateTexture();

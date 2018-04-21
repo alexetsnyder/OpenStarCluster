@@ -131,6 +131,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AstroObject.cpp" />
+    <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="FastNoise.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MathHelper.cpp" />
@@ -142,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="AstroObject.h" />
     <ClInclude Include="Chain.h" />
+    <ClInclude Include="Chunk.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="FastNoise.h" />
     <ClInclude Include="MarkovChain.h" />

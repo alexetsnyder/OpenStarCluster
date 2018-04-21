@@ -1,5 +1,4 @@
 #include "WorldGen.h"
-#include "Color.h"
 
 WorldGen::WorldGen()
 {
@@ -11,27 +10,27 @@ WorldGen::WorldGen(SGC sgc, int width, int height)
 	Init(sgc, width, height);
 }
 
+WorldGen::~WorldGen()
+{
+	for (Chunk* chunk : _chunks)
+	{
+		delete chunk;
+	}
+}
+
 void WorldGen::Init(SGC sgc, int width, int height)
 {
 	_sgc = sgc;
-	_fastNoise.SetSeed(_sgc.SEED);
-	_fastNoise.SetNoiseType(FastNoise::SimplexFractal);
-	_fastNoise.SetFractalOctaves(34);
 	_width = width;
 	_height = height;
 	_isGreyScale = false;
 
-	if (!_generated.create(_width, _height))
-	{
-		printf("Error creating texture in WorldGen.");
-	}
-	_spriteGen.setTexture(_generated.getTexture());
+	/*_heightNoise.SetSeed(_sgc.SEED);
+	_heightNoise.SetNoiseType(FastNoise::SimplexFractal);
+	_heightNoise.SetFractalOctaves(34);
 
-	if (!_greyGen.create(_width, _height))
-	{
-		printf("Error creating grey scale texture.");
-	}
-	_greySpr.setTexture(_greyGen);
+	_world.create(_width, _height);
+	_worldSprite.setTexture(_world.getTexture());*/
 }
 
 void WorldGen::ToggleGreyScale()
@@ -44,34 +43,36 @@ void WorldGen::ToggleGreyScale()
 	}
 	else
 	{
-		Generate();
+		//Generate();
 	}
 }
 
 void WorldGen::Generate()
 {
-	sf::RectangleShape gridSquare;
+	_chunks.push_back(new Chunk(_sgc, sf::Vector2f(_width / 2, _height / 2), _width, _height));
+	LoadChunks(sf::Vector2f(_width / 2, _height / 2));
+	/*sf::RectangleShape gridSquare;
 
-	_generated.clear(sf::Color::White);
-	for (int i = 0; i < _width / 4; ++i)
+	_world.clear(sf::Color::White);
+	for (int i = viewCenter.x - _width / 2; i < viewCenter.x + _width * 3 / 4; ++i)
 	{
-		for (int j = 0; j < _height / 4; ++j)
+		for (int j = viewCenter.y - _height / 2; j < viewCenter.y + _height * 3 / 4; ++j)
 		{
-			sf::Uint8 height = Clamp((_fastNoise.GetNoise(i, j) + 1) / 2);
+			sf::Uint8 height = Clamp((_heightNoise.GetNoise(i, j) + 1) / 2);
 			gridSquare.setPosition(4 * i, 4 * j);
 			gridSquare.setSize(sf::Vector2f(4.0f, 4.0f));
 			gridSquare.setFillColor(GenerateBiomeColor(height));
-			_generated.draw(gridSquare);
+			_world.draw(gridSquare);
 		}
 	}
 
-	_generated.display();
-	_isGenerated = true;
+	_world.display();
+	_worldSprite.setPosition(viewCenter.x - _width / 2, viewCenter.y - _height / 2);*/
 }
 
 void WorldGen::GenerateGreyScale()
 {
-	sf::Uint8* pixels = new sf::Uint8[_width * _height * 4];
+	/*sf::Uint8* pixels = new sf::Uint8[_width * _height * 4];
 
 	for (int i = 0; i < _width; ++i)
 	{
@@ -89,50 +90,113 @@ void WorldGen::GenerateGreyScale()
 	_greyGen.update(pixels);
 	delete[] pixels;
 
-	_isGenerated = true;
+	sf::RectangleShape gridSquare;
+
+	_generated.clear(sf::Color::White);
+	for (int i = 0; i < _width / 4; ++i)
+	{
+		for (int j = 0; j < _height / 4; ++j)
+		{
+			sf::Uint8 color = Clamp((_fastNoise.GetNoise(i, j) + 1) / 2);
+			gridSquare.setPosition(4 * i, 4 * j);
+			gridSquare.setSize(sf::Vector2f(4.0f, 4.0f));
+			gridSquare.setFillColor(sf::Color(color, color, color, 0xFF));;
+			_generated.draw(gridSquare);
+		}
+	}
+
+	_generated.display();
+
+	_isGenerated = true;*/
 }
 
-sf::Color WorldGen::GenerateBiomeColor(float noiseValue)
+void WorldGen::UnloadChunks()
 {
-	sf::Color biomeColor;
+	for (Chunk* chunk : _chunks)
+	{
 
-	if (noiseValue <= 70.0f)
-	{
-		biomeColor = Color::ClearWaterBlue;
 	}
-	else if (noiseValue <= 80.0f)
-	{
-		biomeColor = Color::Sand;
-	}
-	else if (noiseValue <= 120.0f)
-	{
-		biomeColor = Color::Forest;
-	}
-	else if (noiseValue <= 160.0f)
-	{
-		biomeColor = Color::PineForest;
-	}
-	else
-	{
-		biomeColor = Color::Mountain;
-	}
+}
+bool WorldGen::IsChunkWithinView(Chunk chunk, sf::Vector2f viewCenter)
+{
+	float deltaX = chunk.GetCenter().x - viewCenter.x;
+	float deltaY = chunk.GetCenter().y - viewCenter.y;
 
-	return biomeColor;
+	return false;
 }
 
-sf::Uint8 WorldGen::Clamp(float noise)
+void WorldGen::LoadChunks(sf::Vector2f viewCenter)
 {
-	return (noise >= 1.0f) ? 255 : (noise <= 0.0f) ? 0 : static_cast<sf::Uint8>(noise * 255.0f + 0.5f);
+	for (int i = 0; i < _chunks.size(); ++i)
+	{	
+		float totalWidth = 0.5f * (_chunks[i]->GetWidth() + _width);
+		float totalHeight = 0.5f * (_chunks[i]->GetHeight() + _height);
+
+		if (!_chunks[i]->HasLeftN())
+		{
+			sf::Vector2f point(_chunks[i]->GetCenter().x - _chunks[i]->GetWidth() / 2, _chunks[i]->GetCenter().y);
+			if (IsWithinView(point, _chunks[i]->GetWidth(), _chunks[i]->GetHeight(), viewCenter))
+			{
+				_chunks.push_back(new Chunk(_sgc, sf::Vector2f(point.x - _chunks[i]->GetWidth() / 2, point.y), _chunks[i]->GetWidth(), _chunks[i]->GetHeight()));
+				_chunks[i]->SetLeftN(true);
+				_chunks.back()->SetRightN(true);
+			}
+		}
+		if (!_chunks[i]->HasRightN())
+		{
+			sf::Vector2f point(_chunks[i]->GetCenter().x + _chunks[i]->GetWidth() / 2, _chunks[i]->GetCenter().y);
+			if (IsWithinView(point, _chunks[i]->GetWidth(), _chunks[i]->GetHeight(), viewCenter))
+			{
+				_chunks.push_back(new Chunk(_sgc, sf::Vector2f(point.x + _chunks[i]->GetWidth() / 2, point.y), _chunks[i]->GetWidth(), _chunks[i]->GetHeight()));
+				_chunks[i]->SetRightN(true);
+				_chunks.back()->SetLeftN(true);
+			}
+		}
+		if (!_chunks[i]->HasTopN())
+		{
+			sf::Vector2f point(_chunks[i]->GetCenter().x, _chunks[i]->GetCenter().y - _chunks[i]->GetHeight() / 2);
+			if (IsWithinView(point, _chunks[i]->GetWidth(), _chunks[i]->GetHeight(), viewCenter))
+			{
+				_chunks.push_back(new Chunk(_sgc, sf::Vector2f(point.x, point.y - _chunks[i]->GetHeight() / 2), _chunks[i]->GetWidth(), _chunks[i]->GetHeight()));
+				_chunks[i]->SetTopN(true);
+				_chunks.back()->SetBottomN(true);
+			}
+		}
+		if (!_chunks[i]->HasBottomN())
+		{
+			sf::Vector2f point(_chunks[i]->GetCenter().x, _chunks[i]->GetCenter().y + _chunks[i]->GetHeight() / 2);
+			if (IsWithinView(point, _chunks[i]->GetWidth(), _chunks[i]->GetHeight(), viewCenter))
+			{
+				_chunks.push_back(new Chunk(_sgc, sf::Vector2f(point.x, point.y + _chunks[i]->GetHeight() / 2), _chunks[i]->GetWidth(), _chunks[i]->GetHeight()));
+				_chunks[i]->SetBottomN(true);
+				_chunks.back()->SetTopN(true);
+			}
+		}
+	}
+}
+
+bool WorldGen::IsWithinView(sf::Vector2f point, int width, int height, sf::Vector2f viewCenter)
+{
+	float deltaX = point.x - viewCenter.x;
+	float deltaY = point.y - viewCenter.y;
+
+	deltaX = (deltaX < 0) ? -1 * deltaX : deltaX;
+	deltaY = (deltaY < 0) ? -1 * deltaY : deltaY;
+
+	return (deltaX <= _width / 2 && deltaY  <= _height / 2);
+}
+
+void WorldGen::Update(sf::Vector2f viewCenter)
+{
+	//UnloadChunks();
+	//LoadChunks(viewCenter);
 }
 
 void WorldGen::Draw(sf::RenderTarget* target)
 {
-	if (_isGreyScale)
+	for (Chunk* chunk : _chunks)
 	{
-		target->draw(_greySpr);
+		chunk->Draw(target);
 	}
-	else
-	{
-		target->draw(_spriteGen);
-	}
+	//target->draw(_worldSprite);
 }

@@ -45,9 +45,6 @@
     <ClCompile Include="MathHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FastNoise.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AstroObject.cpp">
       <Filter>Source Files\SolarSystem</Filter>
     </ClCompile>
@@ -63,15 +60,18 @@
     <ClCompile Include="WorldGen.cpp">
       <Filter>Source Files\WorldGen</Filter>
     </ClCompile>
+    <ClCompile Include="Chunk.cpp">
+      <Filter>Source Files\WorldGen</Filter>
+    </ClCompile>
+    <ClCompile Include="FastNoise.cpp">
+      <Filter>Source Files\WorldGen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SGC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MathHelpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FastNoise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AstroObject.h">
@@ -96,6 +96,12 @@
       <Filter>Header Files\WorldGen</Filter>
     </ClInclude>
     <ClInclude Include="Color.h">
+      <Filter>Header Files\WorldGen</Filter>
+    </ClInclude>
+    <ClInclude Include="Chunk.h">
+      <Filter>Header Files\WorldGen</Filter>
+    </ClInclude>
+    <ClInclude Include="FastNoise.h">
       <Filter>Header Files\WorldGen</Filter>
     </ClInclude>
   </ItemGroup>
