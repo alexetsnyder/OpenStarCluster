@@ -16,6 +16,7 @@ public:
 	void Update(sf::Vector2f viewCenter);
 	void UnloadChunks();
 	void LoadChunks(sf::Vector2f viewCenter);
+	void UpdateChunks(sf::Vector2f viewCenter);
 
 	void ToggleGreyScale();
 	void Generate();
@@ -24,18 +25,18 @@ public:
 
 	bool IsGenerated() { return _isGenerated; }
 
-	void SetWorldSize(float width, float height) { _width = width; _height = height; }
-	//void SetPosition(sf::Vector2f position) { _position = position; }
+	void SetWorldSize(float width, float height) { _viewWidth = width; _viewHeight = height; }
 	void SetSGC(SGC sgc) { _sgc = sgc; }
-	//void NewSeed(unsigned int seed) { _fastNoise.SetSeed(seed); }
 
 private:
-	bool IsChunkWithinView(Chunk chunk, sf::Vector2f viewCenter);
+	bool IsChunkWithinView(sf::Vector2f chunkCenter, int width, int height, sf::Vector2f viewCenter);
 	bool IsWithinView(sf::Vector2f point, int width, int height, sf::Vector2f viewCenter);
+	bool IsViewCenterInChunk(Chunk* chunk, sf::Vector2f viewCenter);
 
 	SGC _sgc;
-	int _width;
-	int _height;
+	int _viewWidth;
+	int _viewHeight;
+	int _centerChunkIndex;
 
 	bool _isGenerated;
 	bool _isGreyScale;

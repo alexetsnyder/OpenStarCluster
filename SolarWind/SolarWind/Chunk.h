@@ -3,6 +3,19 @@
 #include "FastNoise.h"
 #include "SGC.h"
 
+enum Neighbor
+{
+	CENTER,
+	LEFT,
+	RIGHT,
+	TOP,
+	BOTTOM,
+	LEFTTOP,
+	LEFTBOTTOM,
+	RIGHTTOP,
+	RIGHTBOTTOM
+};
+
 class Chunk
 {
 	public:
@@ -18,23 +31,10 @@ class Chunk
 		sf::Vector2f GetCenter() { return _center; }	
 		int GetWidth() { return _width; }
 		int GetHeight() { return _height; }	
+		bool HasNeighbor(Neighbor which);
 
+		void SetNeighbor(Neighbor which, bool value);
 		void SetSGC(SGC sgc) { _sgc = sgc; }
-
-		bool HasLeftN() { return _hasLeftNeighbor; }
-		bool HasRightN() { return _hasRightNeighbor; }
-		bool HasTopN() { return _hasTopNeighbor; }
-		bool HasBottomN() { return _hasBottomNeighbor; }
-		bool HasLTN() { return _hasLTNeighbor; }
-		bool HasLBN() { return _hasLBNeighbor; }
-		bool HasRTN() { return _hasRTNeighbor; }
-		bool HasRBN() { return _hasRBNeighbor; }
-
-		void SetLeftN(bool value) { _hasLeftNeighbor = value; }
-		void SetRightN(bool value) { _hasRightNeighbor = value; }
-		void SetTopN(bool value) { _hasTopNeighbor = value; }
-		void SetBottomN(bool value) { _hasBottomNeighbor = value; }
-
 
 	private:
 		sf::Color GenerateBiomeColor(sf::Uint8 noiseValue);
@@ -54,9 +54,7 @@ class Chunk
 		bool _hasRTNeighbor;
 		bool _hasRBNeighbor;
 
-
-		FastNoise _heightNoise;
-		
+		FastNoise _heightNoise;		
 		sf::Sprite _chunkSprite;
 		sf::RenderTexture _chunk;
 

@@ -121,7 +121,7 @@ int main(int argc, char* args[])
 			{
 				if (isWorldGen)
 				{
-					world.LoadChunks(worldView.getCenter());
+					//world.LoadChunks(worldView.getCenter());
 				}
 				MoveWorld = false;
 			}
@@ -137,6 +137,11 @@ int main(int argc, char* args[])
 
 			prvMousePos.x = mousePos.x;
 			prvMousePos.y = mousePos.y;
+
+			if (isWorldGen)
+			{
+				world.UpdateChunks(worldView.getCenter());
+			}
 		}
 
 		window.setView(worldView);
