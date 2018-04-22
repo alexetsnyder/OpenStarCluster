@@ -66,12 +66,12 @@
     <ClCompile Include="FastNoise.cpp">
       <Filter>Source Files\WorldGen</Filter>
     </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SGC.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MathHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AstroObject.h">
@@ -103,6 +103,12 @@
     </ClInclude>
     <ClInclude Include="FastNoise.h">
       <Filter>Header Files\WorldGen</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MathHelper.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

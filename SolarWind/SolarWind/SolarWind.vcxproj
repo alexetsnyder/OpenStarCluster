@@ -133,6 +133,7 @@
     <ClCompile Include="AstroObject.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="FastNoise.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="NameGenerator.cpp" />
@@ -146,8 +147,9 @@
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="FastNoise.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="MarkovChain.h" />
-    <ClInclude Include="MathHelpers.h" />
+    <ClInclude Include="MathHelper.h" />
     <ClInclude Include="NameGenerator.h" />
     <ClInclude Include="Orbit.h" />
     <ClInclude Include="SGC.h" />

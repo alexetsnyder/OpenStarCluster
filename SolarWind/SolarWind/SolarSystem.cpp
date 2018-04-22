@@ -1,7 +1,6 @@
 #include "SolarSystem.h"
 #include <random>
 #include <cstdio>
-#include "MathHelpers.h"
 
 SolarSystem::SolarSystem()
 {

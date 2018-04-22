@@ -15,12 +15,10 @@ public:
 
 	void Update(sf::Vector2f viewCenter);
 	void UnloadChunks();
-	void LoadChunks(sf::Vector2f viewCenter);
-	void UpdateChunks(sf::Vector2f viewCenter);
+	void LoadChunks(sf::Vector2f viewCenter, bool greyScale);
+	void UpdateChunks(sf::Vector2f viewCenter, bool greyScale);
 
-	void ToggleGreyScale();
-	void Generate();
-	void GenerateGreyScale();
+	void Generate(bool greyScale);
 	void Draw(sf::RenderTarget* target);
 
 	bool IsGenerated() { return _isGenerated; }
@@ -30,8 +28,8 @@ public:
 
 private:
 	bool IsChunkWithinView(sf::Vector2f chunkCenter, int width, int height, sf::Vector2f viewCenter);
-	bool IsWithinView(sf::Vector2f point, int width, int height, sf::Vector2f viewCenter);
 	bool IsViewCenterInChunk(Chunk* chunk, sf::Vector2f viewCenter);
+	void FreeChunks();
 
 	SGC _sgc;
 	int _viewWidth;
@@ -39,11 +37,5 @@ private:
 	int _centerChunkIndex;
 
 	bool _isGenerated;
-	bool _isGreyScale;
-
-	/*FastNoise _heightNoise;
-	sf::RenderTexture _world;
-	sf::Sprite _worldSprite;*/
-
 	std::vector<Chunk*> _chunks;
 };

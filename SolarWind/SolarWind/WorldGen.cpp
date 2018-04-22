@@ -12,10 +12,16 @@ WorldGen::WorldGen(SGC sgc, int width, int height)
 
 WorldGen::~WorldGen()
 {
+	FreeChunks();
+}
+
+void WorldGen::FreeChunks()
+{
 	for (Chunk* chunk : _chunks)
 	{
 		delete chunk;
 	}
+	_chunks.clear();
 }
 
 void WorldGen::Init(SGC sgc, int width, int height)
@@ -23,94 +29,22 @@ void WorldGen::Init(SGC sgc, int width, int height)
 	_sgc = sgc;
 	_viewWidth = width;
 	_viewHeight = height;
-	_isGreyScale = false;
 	_centerChunkIndex = 0;
-
-	/*_heightNoise.SetSeed(_sgc.SEED);
-	_heightNoise.SetNoiseType(FastNoise::SimplexFractal);
-	_heightNoise.SetFractalOctaves(34);
-
-	_world.create(_width, _height);
-	_worldSprite.setTexture(_world.getTexture());*/
+	_isGenerated = false;
 }
 
-void WorldGen::ToggleGreyScale()
+void WorldGen::Generate(bool greyScale)
 {
-	_isGreyScale = !_isGreyScale;
+	if (!_chunks.empty())
+	{
+		FreeChunks();
+	}
 
-	if (_isGreyScale)
-	{
-		GenerateGreyScale();
-	}
-	else
-	{
-		//Generate();
-	}
+	LoadChunks(sf::Vector2f(_viewWidth / 2, _viewHeight / 2), greyScale);
+	_isGenerated = true;
 }
 
-void WorldGen::Generate()
-{
-	LoadChunks(sf::Vector2f(_viewWidth / 2, _viewHeight / 2));
-	/*sf::RectangleShape gridSquare;
-
-	_world.clear(sf::Color::White);
-	for (int i = viewCenter.x - _width / 2; i < viewCenter.x + _width * 3 / 4; ++i)
-	{
-		for (int j = viewCenter.y - _height / 2; j < viewCenter.y + _height * 3 / 4; ++j)
-		{
-			sf::Uint8 height = Clamp((_heightNoise.GetNoise(i, j) + 1) / 2);
-			gridSquare.setPosition(4 * i, 4 * j);
-			gridSquare.setSize(sf::Vector2f(4.0f, 4.0f));
-			gridSquare.setFillColor(GenerateBiomeColor(height));
-			_world.draw(gridSquare);
-		}
-	}
-
-	_world.display();
-	_worldSprite.setPosition(viewCenter.x - _width / 2, viewCenter.y - _height / 2);*/
-}
-
-void WorldGen::GenerateGreyScale()
-{
-	/*sf::Uint8* pixels = new sf::Uint8[_width * _height * 4];
-
-	for (int i = 0; i < _width; ++i)
-	{
-		for (int j = 0; j < _height; ++j)
-		{
-			sf::Uint8 color = Clamp((_fastNoise.GetNoise(i, j) + 1) / 2);
-			int index = 4 * (i * _height + j);
-			pixels[index] = color;
-			pixels[index + 1] = color;
-			pixels[index + 2] = color;
-			pixels[index + 3] = 255;
-		}
-	}
-
-	_greyGen.update(pixels);
-	delete[] pixels;
-
-	sf::RectangleShape gridSquare;
-
-	_generated.clear(sf::Color::White);
-	for (int i = 0; i < _width / 4; ++i)
-	{
-		for (int j = 0; j < _height / 4; ++j)
-		{
-			sf::Uint8 color = Clamp((_fastNoise.GetNoise(i, j) + 1) / 2);
-			gridSquare.setPosition(4 * i, 4 * j);
-			gridSquare.setSize(sf::Vector2f(4.0f, 4.0f));
-			gridSquare.setFillColor(sf::Color(color, color, color, 0xFF));;
-			_generated.draw(gridSquare);
-		}
-	}
-
-	_generated.display();
-
-	_isGenerated = true;*/
-}
-
-void WorldGen::UpdateChunks(sf::Vector2f viewCenter)
+void WorldGen::UpdateChunks(sf::Vector2f viewCenter, bool greyScale)
 {
 	if (!IsViewCenterInChunk(_chunks[_centerChunkIndex], viewCenter))
 	{
@@ -135,7 +69,7 @@ void WorldGen::UpdateChunks(sf::Vector2f viewCenter)
 		{
 			printf("Left Chunk Added.");
 			newChunkCenter = sf::Vector2f(chunkCenter.x - chunkWidth, chunkCenter.y);
-			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 			_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::LEFT, true);
 			_chunks.back()->SetNeighbor(Neighbor::RIGHT, true);
 			_chunks.back()->SetNeighbor(Neighbor::RIGHTTOP, true);
@@ -147,7 +81,7 @@ void WorldGen::UpdateChunks(sf::Vector2f viewCenter)
 		{
 			printf("Right Chunk Added.");
 			newChunkCenter = sf::Vector2f(chunkCenter.x + chunkWidth, chunkCenter.y);
-			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 			_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::RIGHT, true);
 			_chunks.back()->SetNeighbor(Neighbor::LEFT, true);
 			_chunks.back()->SetNeighbor(Neighbor::LEFTTOP, true);
@@ -159,7 +93,7 @@ void WorldGen::UpdateChunks(sf::Vector2f viewCenter)
 		{
 			printf("Top Chunk Added.");
 			newChunkCenter = sf::Vector2f(chunkCenter.x, chunkCenter.y - chunkHeight);
-			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 			_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::TOP, true);
 			_chunks.back()->SetNeighbor(Neighbor::BOTTOM, true);
 			_chunks.back()->SetNeighbor(Neighbor::RIGHT, true);
@@ -171,7 +105,7 @@ void WorldGen::UpdateChunks(sf::Vector2f viewCenter)
 		{
 			printf("Bottom Chunk Added.");
 			newChunkCenter = sf::Vector2f(chunkCenter.x, chunkCenter.y + chunkHeight);
-			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 			_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::BOTTOM, true);
 			_chunks.back()->SetNeighbor(Neighbor::TOP, true);
 			_chunks.back()->SetNeighbor(Neighbor::RIGHT, true);
@@ -183,7 +117,7 @@ void WorldGen::UpdateChunks(sf::Vector2f viewCenter)
 		{
 			printf("Left Top Chunk Added.");
 			newChunkCenter = sf::Vector2f(chunkCenter.x - chunkWidth, chunkCenter.y - chunkHeight);
-			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 			_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::LEFTTOP, true);
 			_chunks.back()->SetNeighbor(Neighbor::RIGHTBOTTOM, true);
 			_chunks.back()->SetNeighbor(Neighbor::RIGHT, true);
@@ -193,7 +127,7 @@ void WorldGen::UpdateChunks(sf::Vector2f viewCenter)
 		{
 			printf("Left Bottom Chunk Added.");
 			newChunkCenter = sf::Vector2f(chunkCenter.x - chunkWidth, chunkCenter.y + chunkHeight);
-			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 			_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::LEFTBOTTOM, true);
 			_chunks.back()->SetNeighbor(Neighbor::RIGHTTOP, true);
 			_chunks.back()->SetNeighbor(Neighbor::TOP, true);
@@ -203,7 +137,7 @@ void WorldGen::UpdateChunks(sf::Vector2f viewCenter)
 		{
 			printf("Right Top Chunk Added.");
 			newChunkCenter = sf::Vector2f(chunkCenter.x + chunkWidth, chunkCenter.y - chunkHeight);
-			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 			_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::RIGHTTOP, true);
 			_chunks.back()->SetNeighbor(Neighbor::LEFTBOTTOM, true);
 			_chunks.back()->SetNeighbor(Neighbor::LEFT, true);
@@ -213,7 +147,7 @@ void WorldGen::UpdateChunks(sf::Vector2f viewCenter)
 		{
 			printf("Right Bottom Chunk Added.");
 			newChunkCenter = sf::Vector2f(chunkCenter.x + chunkWidth, chunkCenter.y + chunkHeight);
-			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+			_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 			_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::RIGHTBOTTOM, true);
 			_chunks.back()->SetNeighbor(Neighbor::LEFTTOP, true);
 			_chunks.back()->SetNeighbor(Neighbor::LEFT, true);
@@ -222,17 +156,9 @@ void WorldGen::UpdateChunks(sf::Vector2f viewCenter)
 	}
 }
 
-void WorldGen::UnloadChunks()
+void WorldGen::LoadChunks(sf::Vector2f viewCenter, bool greyScale)
 {
-	for (Chunk* chunk : _chunks)
-	{
-
-	}
-}
-
-void WorldGen::LoadChunks(sf::Vector2f viewCenter)
-{
-	_chunks.push_back(new Chunk(_sgc, sf::Vector2f(viewCenter.x, viewCenter.y), _viewWidth, _viewHeight));
+	_chunks.push_back(new Chunk(_sgc, sf::Vector2f(viewCenter.x, viewCenter.y), _viewWidth, _viewHeight, greyScale));
 
 	sf::Vector2f chunkCenter(_chunks[_centerChunkIndex]->GetCenter());
 	float chunkWidth = _chunks[_centerChunkIndex]->GetWidth();
@@ -240,7 +166,7 @@ void WorldGen::LoadChunks(sf::Vector2f viewCenter)
 
 	//LEFT
 	sf::Vector2f newChunkCenter(chunkCenter.x - chunkWidth, chunkCenter.y);
-	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 	_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::LEFT, true);
 	_chunks.back()->SetNeighbor(Neighbor::RIGHT, true);
 	_chunks.back()->SetNeighbor(Neighbor::RIGHTTOP, true);
@@ -250,7 +176,7 @@ void WorldGen::LoadChunks(sf::Vector2f viewCenter)
 
 	//RIGHT 
 	newChunkCenter = sf::Vector2f(chunkCenter.x + chunkWidth, chunkCenter.y);
-	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 	_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::RIGHT, true);
 	_chunks.back()->SetNeighbor(Neighbor::LEFT, true);
 	_chunks.back()->SetNeighbor(Neighbor::LEFTTOP, true);
@@ -260,7 +186,7 @@ void WorldGen::LoadChunks(sf::Vector2f viewCenter)
 
 	//TOP
 	newChunkCenter = sf::Vector2f(chunkCenter.x, chunkCenter.y - chunkHeight);
-	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 	_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::TOP, true);
 	_chunks.back()->SetNeighbor(Neighbor::BOTTOM, true);
 	_chunks.back()->SetNeighbor(Neighbor::RIGHT, true);
@@ -270,7 +196,7 @@ void WorldGen::LoadChunks(sf::Vector2f viewCenter)
 
 	//BOTTOM
 	newChunkCenter = sf::Vector2f(chunkCenter.x, chunkCenter.y + chunkHeight);
-	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 	_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::BOTTOM, true);
 	_chunks.back()->SetNeighbor(Neighbor::TOP, true);
 	_chunks.back()->SetNeighbor(Neighbor::RIGHT, true);
@@ -280,7 +206,7 @@ void WorldGen::LoadChunks(sf::Vector2f viewCenter)
 
 	//LEFTTOP
 	newChunkCenter = sf::Vector2f(chunkCenter.x - chunkWidth, chunkCenter.y - chunkHeight);
-	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 	_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::LEFTTOP, true);
 	_chunks.back()->SetNeighbor(Neighbor::RIGHTBOTTOM, true);
 	_chunks.back()->SetNeighbor(Neighbor::RIGHT, true);
@@ -288,7 +214,7 @@ void WorldGen::LoadChunks(sf::Vector2f viewCenter)
 
 	//LEFTBOTTOM
 	newChunkCenter = sf::Vector2f(chunkCenter.x - chunkWidth, chunkCenter.y + chunkHeight);
-	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 	_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::LEFTBOTTOM, true);
 	_chunks.back()->SetNeighbor(Neighbor::RIGHTTOP, true);
 	_chunks.back()->SetNeighbor(Neighbor::TOP, true);
@@ -296,7 +222,7 @@ void WorldGen::LoadChunks(sf::Vector2f viewCenter)
 
 	//RIGHTTOP
 	newChunkCenter = sf::Vector2f(chunkCenter.x + chunkWidth, chunkCenter.y - chunkHeight);
-	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 	_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::RIGHTTOP, true);
 	_chunks.back()->SetNeighbor(Neighbor::LEFTBOTTOM, true);
 	_chunks.back()->SetNeighbor(Neighbor::LEFT, true);
@@ -304,12 +230,20 @@ void WorldGen::LoadChunks(sf::Vector2f viewCenter)
 
 	//RIGHTBOTTOM
 	newChunkCenter = sf::Vector2f(chunkCenter.x + chunkWidth, chunkCenter.y + chunkHeight);
-	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight));
+	_chunks.push_back(new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale));
 	_chunks[_centerChunkIndex]->SetNeighbor(Neighbor::RIGHTBOTTOM, true);
 	_chunks.back()->SetNeighbor(Neighbor::LEFTTOP, true);
 	_chunks.back()->SetNeighbor(Neighbor::LEFT, true);
 	_chunks.back()->SetNeighbor(Neighbor::TOP, true);
 
+}
+
+void WorldGen::UnloadChunks()
+{
+	for (Chunk* chunk : _chunks)
+	{
+
+	}
 }
 
 bool WorldGen::IsViewCenterInChunk(Chunk* chunk, sf::Vector2f viewCenter)
@@ -321,17 +255,6 @@ bool WorldGen::IsViewCenterInChunk(Chunk* chunk, sf::Vector2f viewCenter)
 
 	return (deltaX <= chunk->GetWidth() && deltaY <= chunk->GetHeight());
 
-}
-
-bool WorldGen::IsWithinView(sf::Vector2f point, int width, int height, sf::Vector2f viewCenter)
-{
-	float deltaX = point.x - viewCenter.x;
-	float deltaY = point.y - viewCenter.y;
-
-	deltaX = (deltaX < 0) ? -1 * deltaX : deltaX;
-	deltaY = (deltaY < 0) ? -1 * deltaY : deltaY;
-
-	return (deltaX <= _viewWidth / 2 && deltaY  <= _viewHeight / 2);
 }
 
 bool WorldGen::IsChunkWithinView(sf::Vector2f chunkCenter, int width, int height, sf::Vector2f viewCenter)
@@ -349,8 +272,7 @@ bool WorldGen::IsChunkWithinView(sf::Vector2f chunkCenter, int width, int height
 
 void WorldGen::Update(sf::Vector2f viewCenter)
 {
-	//UnloadChunks();
-	//LoadChunks(viewCenter);
+	
 }
 
 void WorldGen::Draw(sf::RenderTarget* target)
@@ -359,5 +281,4 @@ void WorldGen::Draw(sf::RenderTarget* target)
 	{
 		chunk->Draw(target);
 	}
-	//target->draw(_worldSprite);
 }

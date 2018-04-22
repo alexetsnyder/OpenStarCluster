@@ -6,5 +6,4 @@ struct SGC
 	unsigned int WINDOW_HEIGHT;
 	unsigned int WINDOW_WIDTH;
 	unsigned int SEED;
-	sf::Clock TIME;
 };

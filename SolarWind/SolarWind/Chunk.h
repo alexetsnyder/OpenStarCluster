@@ -20,7 +20,7 @@ class Chunk
 {
 	public:
 		Chunk();
-		Chunk(SGC sgc, sf::Vector2f center, int width, int height);
+		Chunk(SGC sgc, sf::Vector2f center, int width, int height, bool greyScale);
 
 		void Init();
 		void CreateChunk();
@@ -44,6 +44,7 @@ class Chunk
 		int _width;
 		int _height;
 		sf::Vector2f _center;
+		bool _isGreyScale;
 
 		bool _hasLeftNeighbor;
 		bool _hasRightNeighbor;

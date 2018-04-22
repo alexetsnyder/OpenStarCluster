@@ -1,4 +1,4 @@
-#include "MathHelpers.h"
+#include "MathHelper.h"
 
 bool GetRandMod(float value, float minPercent, float maxPercent, int& outMod)
 {

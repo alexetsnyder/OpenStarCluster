@@ -6,17 +6,22 @@ Chunk::Chunk()
 
 }
 
-Chunk::Chunk(SGC sgc, sf::Vector2f center, int width, int height)
+Chunk::Chunk(SGC sgc, sf::Vector2f center, int width, int height, bool greyScale)
 {
 	_sgc = sgc;
 	_center = center;
 	_width = width;
 	_height = height;
+	_isGreyScale = greyScale;
 
 	_hasLeftNeighbor = false;
 	_hasRightNeighbor = false;
 	_hasTopNeighbor = false;
 	_hasBottomNeighbor = false;
+	_hasLTNeighbor = false;
+	_hasLBNeighbor = false;
+	_hasRTNeighbor = false;
+	_hasRBNeighbor = false;
 
 	Init();
 }
@@ -106,19 +111,38 @@ void Chunk::SetNeighbor(Neighbor which, bool value)
 void Chunk::CreateChunk()
 {
 	sf::RectangleShape gridSquare;
-
 	_chunk.clear(sf::Color::White);
-	int x = _center.x - _width / 2;
-	int y = _center.y - _height / 2;
-	for (int i = 0; i < _width / 4; ++i)
-	{
-		for (int j = 0; j < _height / 4; ++j)
+
+	if (!_isGreyScale)
+	{	
+		int x = _center.x - _width / 2;
+		int y = _center.y - _height / 2;
+		for (int i = 0; i < _width / 4; ++i)
 		{
-			sf::Uint8 height = Clamp((_heightNoise.GetNoise(x + 4 * i, y + 4 * j) + 1) / 2);
-			gridSquare.setPosition(4 * i, 4 * j);
-			gridSquare.setSize(sf::Vector2f(4.0f, 4.0f));
-			gridSquare.setFillColor(GenerateBiomeColor(height));
-			_chunk.draw(gridSquare);
+			for (int j = 0; j < _height / 4; ++j)
+			{
+				sf::Uint8 height = Clamp((_heightNoise.GetNoise(x + 4 * i, y + 4 * j) + 1) / 2);
+				gridSquare.setPosition(4 * i, 4 * j);
+				gridSquare.setSize(sf::Vector2f(4.0f, 4.0f));
+				gridSquare.setFillColor(GenerateBiomeColor(height));
+				_chunk.draw(gridSquare);
+			}
+		}
+	}
+	else
+	{
+		int x = _center.x - _width / 2;
+		int y = _center.y - _height / 2;
+		for (int i = 0; i < _width / 4; ++i)
+		{
+			for (int j = 0; j < _height / 4; ++j)
+			{
+				sf::Uint8 height = Clamp((_heightNoise.GetNoise(x + 4 * i, y + 4 * j) + 1) / 2);
+				gridSquare.setPosition(4 * i, 4 * j);
+				gridSquare.setSize(sf::Vector2f(4.0f, 4.0f));
+				gridSquare.setFillColor(sf::Color(height, height, height, 0xFF));
+				_chunk.draw(gridSquare);
+			}
 		}
 	}
 

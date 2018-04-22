@@ -68,8 +68,7 @@ void Planet::CreateOrbit(std::mt19937 engine, sf::Vector2f orbitPos, float orbit
 
 void Planet::UpdateOrbit()
 {
-	sf::Time time = GetSGC().TIME.getElapsedTime();
-	_orbit.CalculateNextOrbitAngle(time);
+
 }
 
 void Planet::CalculatePosition()
