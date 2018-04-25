@@ -136,6 +136,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MathHelper.cpp" />
+    <ClCompile Include="Message.cpp" />
     <ClCompile Include="NameGenerator.cpp" />
     <ClCompile Include="Orbit.cpp" />
     <ClCompile Include="SolarSystem.cpp" />
@@ -150,6 +151,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="MarkovChain.h" />
     <ClInclude Include="MathHelper.h" />
+    <ClInclude Include="Message.h" />
     <ClInclude Include="NameGenerator.h" />
     <ClInclude Include="Orbit.h" />
     <ClInclude Include="SGC.h" />

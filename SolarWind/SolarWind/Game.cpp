@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "MathHelper.h"
+#include <thread>
 
 Game::Game()
 {
@@ -63,7 +64,12 @@ void Game::Start()
 	_mousePos = sf::Vector2i(0, 0);
 	_prvMousePos = sf::Vector2i(0, 0);
 
+	std::thread loadChunksThread(&Game::LoadChunks, this);
+
 	Loop();
+
+	Pipe::SendMessage(MessageType::STOP, MessageDestination::LOADCHUNKS);
+	loadChunksThread.join();
 }
 
 void Game::Loop()
@@ -82,6 +88,19 @@ void Game::Update()
 	_mousePos = sf::Mouse::getPosition(_window);
 
 	MoveWorld();
+
+	if (_isWorldGen)
+	{
+		Message message;
+		if (Pipe::Listen(MessageDestination::GRAPHICS, message))
+		{
+			if (message.GetMessageType() == MessageType::LOADED)
+			{
+				_world.MergeStagingToChunks();
+				_world.UnloadChunks();
+			}
+		}
+	}
 
 	if (_isWorldGen)
 	{
@@ -115,16 +134,17 @@ void Game::MoveWorld()
 	{
 		float x = _prvMousePos.x - _mousePos.x;
 		float y = _prvMousePos.y - _mousePos.y;
-		_worldView.move(x, y);
+		_worldView.move(0.5*x, 0.5*y);
 
 		_prvMousePos.x = _mousePos.x;
 		_prvMousePos.y = _mousePos.y;
 
 		if (_isWorldGen)
 		{
-			//std::thread chunkThread(LoadChunksInThread, &world, worldView.getCenter(), isGreyScale);
-			//chunkThread.join();
-			_world.UpdateChunks(_worldView.getCenter(), _isGreyScale);
+			if (_world.UpdateCenterChunk(_worldView.getCenter()))
+			{
+				Pipe::SendMessage(MessageType::LOAD, MessageDestination::LOADCHUNKS);
+			}
 		}
 	}
 }
@@ -234,3 +254,28 @@ void Game::Draw()
 		_solarSystem.Draw(&_window);
 	}
 }
+
+void Game::LoadChunks()
+{
+	bool isRunning = true;
+	while (isRunning)
+	{
+		Message message;
+		if (Pipe::Listen(MessageDestination::LOADCHUNKS, message))
+		{
+			switch (message.GetMessageType())
+			{
+				case MessageType::LOAD:
+					_world.UpdateChunksToStaging(_isGreyScale);
+					Pipe::SendMessage(MessageType::LOADED, MessageDestination::GRAPHICS);
+					break;
+				case MessageType::STOP:
+					isRunning = false;
+					break;
+			}
+		}
+	}
+
+	printf("Load Chunks Thread Ending.");
+}
+

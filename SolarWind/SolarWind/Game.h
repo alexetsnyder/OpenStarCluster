@@ -1,9 +1,11 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <random>
-#include <queue>
 #include "SolarSystem.h"
 #include "WorldGen.h"
+#include "Message.h"
+
+//void LoadChunksInThread(WorldGen* world, sf::View* worldView, bool greyScale);
 
 class Game
 {
@@ -19,11 +21,12 @@ class Game
 		void PollEvents();
 		void MoveWorld();
 
+		void LoadChunks();
+
 	private:
 		sf::RenderWindow _window;
 
 		std::mt19937 _engine;
-
 		sf::Vector2i _mousePos;
 		sf::Vector2i _prvMousePos;
 
@@ -35,5 +38,5 @@ class Game
 
 		SolarSystem _solarSystem;
 		sf::View _solarSystemView;
-
 };
+

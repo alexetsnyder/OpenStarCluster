@@ -13,15 +13,7 @@ Chunk::Chunk(SGC sgc, sf::Vector2f center, int width, int height, bool greyScale
 	_width = width;
 	_height = height;
 	_isGreyScale = greyScale;
-
-	_hasLeftNeighbor = false;
-	_hasRightNeighbor = false;
-	_hasTopNeighbor = false;
-	_hasBottomNeighbor = false;
-	_hasLTNeighbor = false;
-	_hasLBNeighbor = false;
-	_hasRTNeighbor = false;
-	_hasRBNeighbor = false;
+	_isGenerated = false;
 
 	Init();
 }
@@ -40,72 +32,6 @@ void Chunk::Init()
 	_chunkSprite.setPosition(_center.x - _width / 2, _center.y - _height / 2);
 
 	CreateChunk();
-}
-
-bool Chunk::HasNeighbor(Neighbor which)
-{
-	bool hasNeighbor = false;
-
-	switch (which)
-	{
-		case Neighbor::LEFT:
-			hasNeighbor = _hasLeftNeighbor;
-			break;
-		case Neighbor::RIGHT:
-			hasNeighbor = _hasRightNeighbor;
-			break;
-		case Neighbor::TOP:
-			hasNeighbor = _hasTopNeighbor;
-			break;
-		case Neighbor::BOTTOM:
-			hasNeighbor = _hasBottomNeighbor;
-			break;
-		case Neighbor::LEFTTOP:
-			hasNeighbor = _hasLTNeighbor;
-			break;
-		case Neighbor::LEFTBOTTOM:
-			hasNeighbor = _hasLBNeighbor;
-			break;
-		case Neighbor::RIGHTTOP:
-			hasNeighbor = _hasRTNeighbor;
-			break;
-		case Neighbor::RIGHTBOTTOM:
-			hasNeighbor = _hasRBNeighbor;
-			break;
-	}
-
-	return hasNeighbor;
-}
-
-void Chunk::SetNeighbor(Neighbor which, bool value)
-{
-	switch (which)
-	{
-	case Neighbor::LEFT:
-		_hasLeftNeighbor = value;
-		break;
-	case Neighbor::RIGHT:
-		_hasRightNeighbor = value;
-		break;
-	case Neighbor::TOP:
-		_hasTopNeighbor = value;
-		break;
-	case Neighbor::BOTTOM:
-		_hasBottomNeighbor = value;
-		break;
-	case Neighbor::LEFTTOP:
-		_hasLTNeighbor = value;
-		break;
-	case Neighbor::LEFTBOTTOM:
-		_hasLBNeighbor = value;
-		break;
-	case Neighbor::RIGHTTOP:
-		_hasRTNeighbor = value;
-		break;
-	case Neighbor::RIGHTBOTTOM:
-		_hasRBNeighbor = value;
-		break;
-	}
 }
 
 void Chunk::CreateChunk()
@@ -147,6 +73,7 @@ void Chunk::CreateChunk()
 	}
 
 	_chunk.display();
+	_isGenerated = true;
 }
 
 sf::Color Chunk::GenerateBiomeColor(sf::Uint8 noiseValue)

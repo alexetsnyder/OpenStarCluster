@@ -3,19 +3,6 @@
 #include "FastNoise.h"
 #include "SGC.h"
 
-enum Neighbor
-{
-	CENTER,
-	LEFT,
-	RIGHT,
-	TOP,
-	BOTTOM,
-	LEFTTOP,
-	LEFTBOTTOM,
-	RIGHTTOP,
-	RIGHTBOTTOM
-};
-
 class Chunk
 {
 	public:
@@ -31,9 +18,7 @@ class Chunk
 		sf::Vector2f GetCenter() { return _center; }	
 		int GetWidth() { return _width; }
 		int GetHeight() { return _height; }	
-		bool HasNeighbor(Neighbor which);
 
-		void SetNeighbor(Neighbor which, bool value);
 		void SetSGC(SGC sgc) { _sgc = sgc; }
 
 	private:
@@ -45,15 +30,7 @@ class Chunk
 		int _height;
 		sf::Vector2f _center;
 		bool _isGreyScale;
-
-		bool _hasLeftNeighbor;
-		bool _hasRightNeighbor;
-		bool _hasTopNeighbor;
-		bool _hasBottomNeighbor;
-		bool _hasLTNeighbor;
-		bool _hasLBNeighbor;
-		bool _hasRTNeighbor;
-		bool _hasRBNeighbor;
+		bool _isGenerated;
 
 		FastNoise _heightNoise;		
 		sf::Sprite _chunkSprite;
