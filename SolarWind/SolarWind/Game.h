@@ -5,8 +5,6 @@
 #include "WorldGen.h"
 #include "Message.h"
 
-//void LoadChunksInThread(WorldGen* world, sf::View* worldView, bool greyScale);
-
 class Game
 {
 	public:
