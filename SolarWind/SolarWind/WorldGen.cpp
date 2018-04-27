@@ -1,5 +1,6 @@
 #include "WorldGen.h"
 
+//Pair Vector2f Wrapper Class
 bool operator< (const Pair& lhs, const Pair& rhs)
 {
 	return (lhs._pair.x < rhs._pair.x || (!(rhs._pair.x < lhs._pair.x) && lhs._pair.y < rhs._pair.y));
@@ -10,14 +11,15 @@ bool operator> (const Pair& lhs, const Pair& rhs)
 	return rhs < lhs;
 }
 
+//WorldGen Class
 WorldGen::WorldGen()
 {
 
 }
 
-WorldGen::WorldGen(SGC sgc, int width, int height)
+WorldGen::WorldGen(SGC sgc, sf::Vector2f origin, int chunkCount, int width, int height)
 {
-	Init(sgc, width, height);
+	Init(sgc, origin, chunkCount, width, height);
 }
 
 WorldGen::~WorldGen()
@@ -34,13 +36,15 @@ void WorldGen::FreeChunks()
 	_chunks.clear();
 }
 
-void WorldGen::Init(SGC sgc, int width, int height)
+void WorldGen::Init(SGC sgc, sf::Vector2f origin, int chunkCount, int width, int height)
 {
 	_sgc = sgc;
-	_viewWidth = width;
-	_viewHeight = height;
+	_chunkWidth = width;
+	_chunkHeight = height;
+	_origin = origin;
 	_isGenerated = false;
-	_centerChunk = Pair(_viewWidth / 2, _viewHeight / 2);
+	_chunkCount = chunkCount;
+	_centerChunk = Pair(origin);
 }
 
 void WorldGen::Generate(bool greyScale)
@@ -56,115 +60,28 @@ void WorldGen::Generate(bool greyScale)
 
 void WorldGen::LoadChunks(bool greyScale)
 {
-	sf::Vector2f chunkCenter = _centerChunk.pair();
-	float chunkWidth = _viewWidth;
-	float chunkHeight = _viewHeight;
+	sf::Vector2f chunkCenter = _centerChunk.GetVector2f();
+	float chunkWidth = _chunkWidth;
+	float chunkHeight = _chunkHeight;
+	int count = 0;
 
-	_chunks.insert(std::make_pair(_centerChunk, new Chunk(_sgc, chunkCenter, _viewWidth, _viewHeight, greyScale)));
-
-	//LEFT
-	sf::Vector2f newChunkCenter(chunkCenter.x - chunkWidth, chunkCenter.y);
-	_chunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale)));
-
-	//RIGHT 
-	newChunkCenter = sf::Vector2f(chunkCenter.x + chunkWidth, chunkCenter.y);
-	_chunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale)));
-
-	//TOP
-	newChunkCenter = sf::Vector2f(chunkCenter.x, chunkCenter.y - chunkHeight);
-	_chunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale)));
-
-	//BOTTOM
-	newChunkCenter = sf::Vector2f(chunkCenter.x, chunkCenter.y + chunkHeight);
-	_chunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale)));
-
-	//LEFTTOP
-	newChunkCenter = sf::Vector2f(chunkCenter.x - chunkWidth, chunkCenter.y - chunkHeight);
-	_chunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale)));
-
-	//LEFTBOTTOM
-	newChunkCenter = sf::Vector2f(chunkCenter.x - chunkWidth, chunkCenter.y + chunkHeight);
-	_chunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale)));
-
-	//RIGHTTOP
-	newChunkCenter = sf::Vector2f(chunkCenter.x + chunkWidth, chunkCenter.y - chunkHeight);
-	_chunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale)));
-
-	//RIGHTBOTTOM
-	newChunkCenter = sf::Vector2f(chunkCenter.x + chunkWidth, chunkCenter.y + chunkHeight);
-	_chunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale)));
-}
-
-void WorldGen::UpdateChunks(sf::Vector2f viewCenter, bool greyScale)
-{
-	if (!IsViewCenterInChunk(_chunks[_centerChunk], viewCenter))
+	for (float i = chunkCenter.x - _chunkCount * chunkWidth; i <= chunkCenter.x + _chunkCount * chunkWidth; i += chunkWidth)
 	{
-		for (std::map<Pair, Chunk*>::value_type& chunk : _chunks)
+		for (float j = chunkCenter.y - _chunkCount * chunkHeight; j <= chunkCenter.y + _chunkCount * chunkHeight; j += chunkHeight)
 		{
-			if (IsViewCenterInChunk(chunk.second, viewCenter))
+			sf::Vector2f newChunkCenter(i, j);
+			if (!Contains(newChunkCenter))
 			{
-				_centerChunk = chunk.first;
-				break;
+				_chunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale)));
+				++count;
 			}
 		}
-
-		sf::Vector2f chunkCenter(_centerChunk.pair());
-		float chunkWidth = _viewWidth;
-		float chunkHeight = _viewHeight;
-		
-		sf::Vector2f leftChunkCenter(chunkCenter.x - chunkWidth, chunkCenter.y);
-		if (!Contains(leftChunkCenter))
-		{
-			_chunks.insert(std::make_pair(leftChunkCenter, new Chunk(_sgc, leftChunkCenter, chunkWidth, chunkHeight, greyScale)));
-		}
-		
-		sf::Vector2f rightChunkCenter(chunkCenter.x + chunkWidth, chunkCenter.y);
-		if (!Contains(rightChunkCenter))
-		{
-			_chunks.insert(std::make_pair(rightChunkCenter, new Chunk(_sgc, rightChunkCenter, chunkWidth, chunkHeight, greyScale)));
-		}
-
-		sf::Vector2f topChunkCenter(chunkCenter.x, chunkCenter.y - chunkHeight);
-		if (!Contains(topChunkCenter))
-		{
-			_chunks.insert(std::make_pair(topChunkCenter, new Chunk(_sgc, topChunkCenter, chunkWidth, chunkHeight, greyScale)));
-		}
-
-		sf::Vector2f bottomChunkCenter(chunkCenter.x, chunkCenter.y + chunkHeight);
-		if (!Contains(bottomChunkCenter))
-		{
-			_chunks.insert(std::make_pair(bottomChunkCenter, new Chunk(_sgc, bottomChunkCenter, chunkWidth, chunkHeight, greyScale)));
-		}
-
-		sf::Vector2f leftTopChunkCenter(chunkCenter.x - chunkWidth, chunkCenter.y - chunkHeight);
-		if (!Contains(leftTopChunkCenter))
-		{
-			_chunks.insert(std::make_pair(leftTopChunkCenter, new Chunk(_sgc, leftTopChunkCenter, chunkWidth, chunkHeight, greyScale)));
-		}
-
-		sf::Vector2f leftBottomChunkCenter(chunkCenter.x - chunkWidth, chunkCenter.y + chunkHeight);
-		if (!Contains(leftBottomChunkCenter))
-		{
-			_chunks.insert(std::make_pair(leftBottomChunkCenter, new Chunk(_sgc, leftBottomChunkCenter, chunkWidth, chunkHeight, greyScale)));
-		}
-
-		sf::Vector2f rightTopChunkCenter(chunkCenter.x + chunkWidth, chunkCenter.y - chunkHeight);
-		if (!Contains(rightTopChunkCenter))
-		{
-			_chunks.insert(std::make_pair(rightTopChunkCenter, new Chunk(_sgc, rightTopChunkCenter, chunkWidth, chunkHeight, greyScale)));
-		}
-
-		sf::Vector2f rightBottomChunkCenter(chunkCenter.x + chunkWidth, chunkCenter.y + chunkHeight);
-		if (!Contains(rightBottomChunkCenter))
-		{
-			_chunks.insert(std::make_pair(rightBottomChunkCenter, new Chunk(_sgc, rightBottomChunkCenter, chunkWidth, chunkHeight, greyScale)));
-		}
-
-		UnloadChunks();
 	}
+
+	printf("Total number of Chunks: %d\n", count);
 }
 
-bool WorldGen::UpdateCenterChunk(sf::Vector2f newViewCenter)
+bool WorldGen::IsNewChunkInView(sf::Vector2f newViewCenter)
 {
 	bool updated = false;
 
@@ -184,61 +101,29 @@ bool WorldGen::UpdateCenterChunk(sf::Vector2f newViewCenter)
 	return updated;
 }
 
-void WorldGen::UpdateChunksToStaging(bool greyScale)
+void WorldGen::LoadChunksToStaging(bool greyScale)
 {
 	_staging.lock();
-	sf::Vector2f chunkCenter(_centerChunk.pair());
-	float chunkWidth = _viewWidth;
-	float chunkHeight = _viewHeight;
+	sf::Vector2f chunkCenter = _centerChunk.GetVector2f();
+	float chunkWidth = _chunkWidth;
+	float chunkHeight = _chunkHeight;
+	int count = 0;
 
-	sf::Vector2f leftChunkCenter(chunkCenter.x - chunkWidth, chunkCenter.y);
-	if (!Contains(leftChunkCenter))
+	for (float i = chunkCenter.x - _chunkCount * chunkWidth; i <= chunkCenter.x + _chunkCount * chunkWidth; i += chunkWidth)
 	{
-		_stagingChunks.insert(std::make_pair(leftChunkCenter, new Chunk(_sgc, leftChunkCenter, chunkWidth, chunkHeight, greyScale)));
-	}
-
-	sf::Vector2f rightChunkCenter(chunkCenter.x + chunkWidth, chunkCenter.y);
-	if (!Contains(rightChunkCenter))
-	{
-		_stagingChunks.insert(std::make_pair(rightChunkCenter, new Chunk(_sgc, rightChunkCenter, chunkWidth, chunkHeight, greyScale)));
-	}
-
-	sf::Vector2f topChunkCenter(chunkCenter.x, chunkCenter.y - chunkHeight);
-	if (!Contains(topChunkCenter))
-	{
-		_stagingChunks.insert(std::make_pair(topChunkCenter, new Chunk(_sgc, topChunkCenter, chunkWidth, chunkHeight, greyScale)));
-	}
-
-	sf::Vector2f bottomChunkCenter(chunkCenter.x, chunkCenter.y + chunkHeight);
-	if (!Contains(bottomChunkCenter))
-	{
-		_stagingChunks.insert(std::make_pair(bottomChunkCenter, new Chunk(_sgc, bottomChunkCenter, chunkWidth, chunkHeight, greyScale)));
-	}
-
-	sf::Vector2f leftTopChunkCenter(chunkCenter.x - chunkWidth, chunkCenter.y - chunkHeight);
-	if (!Contains(leftTopChunkCenter))
-	{
-		_stagingChunks.insert(std::make_pair(leftTopChunkCenter, new Chunk(_sgc, leftTopChunkCenter, chunkWidth, chunkHeight, greyScale)));
-	}
-
-	sf::Vector2f leftBottomChunkCenter(chunkCenter.x - chunkWidth, chunkCenter.y + chunkHeight);
-	if (!Contains(leftBottomChunkCenter))
-	{
-		_stagingChunks.insert(std::make_pair(leftBottomChunkCenter, new Chunk(_sgc, leftBottomChunkCenter, chunkWidth, chunkHeight, greyScale)));
-	}
-
-	sf::Vector2f rightTopChunkCenter(chunkCenter.x + chunkWidth, chunkCenter.y - chunkHeight);
-	if (!Contains(rightTopChunkCenter))
-	{
-		_stagingChunks.insert(std::make_pair(rightTopChunkCenter, new Chunk(_sgc, rightTopChunkCenter, chunkWidth, chunkHeight, greyScale)));
-	}
-
-	sf::Vector2f rightBottomChunkCenter(chunkCenter.x + chunkWidth, chunkCenter.y + chunkHeight);
-	if (!Contains(rightBottomChunkCenter))
-	{
-		_stagingChunks.insert(std::make_pair(rightBottomChunkCenter, new Chunk(_sgc, rightBottomChunkCenter, chunkWidth, chunkHeight, greyScale)));
+		for (float j = chunkCenter.y - _chunkCount * chunkHeight; j <= chunkCenter.y + _chunkCount * chunkHeight; j += chunkHeight)
+		{
+			sf::Vector2f newChunkCenter(i, j);
+			if (!Contains(newChunkCenter))
+			{
+				_stagingChunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale)));
+				++count;
+			}
+		}
 	}
 	_staging.unlock();
+
+	printf("Total number of Chunks To Staging: %d\n", count);
 }
 
 void WorldGen::MergeStagingToChunks()
@@ -259,7 +144,7 @@ void WorldGen::UnloadChunks()
 	std::vector<Pair> markedForDelete;
 	for (std::map<Pair, Chunk*>::value_type& chunk : _chunks)
 	{
-		if (!IsChunkNextToCenter(chunk.second))
+		if (!IsChunkWithinDistanceToCenter(chunk.second))
 		{
 			markedForDelete.push_back(chunk.first);
 			delete chunk.second;
@@ -288,15 +173,15 @@ bool WorldGen::IsViewCenterInChunk(Chunk* chunk, sf::Vector2f viewCenter)
 
 }
 
-bool WorldGen::IsChunkNextToCenter(Chunk* chunk)
+bool WorldGen::IsChunkWithinDistanceToCenter(Chunk* chunk)
 {
-	sf::Vector2f chunkCenter = _centerChunk.pair();
+	sf::Vector2f chunkCenter = _centerChunk.GetVector2f();
 	float deltaX = chunk->GetCenter().x - chunkCenter.x;
 	float deltaY = chunk->GetCenter().y - chunkCenter.y;
 	deltaX = (deltaX < 0) ? -1 * deltaX : deltaX;
 	deltaY = (deltaY < 0) ? -1 * deltaY : deltaY;
 
-	return (deltaX <= _viewWidth && deltaY <= _viewHeight);
+	return (deltaX <= _chunkCount * _chunkWidth && deltaY <= _chunkCount * _chunkHeight);
 }
 
 void WorldGen::Update(sf::Vector2f viewCenter)

@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "MathHelper.h"
+#include <chrono>
 #include <thread>
 
 Game::Game()
@@ -47,7 +48,7 @@ void Game::Start()
 	_solarSystem.SetSSC(ssc);
 	_solarSystem.Init(sgc);
 
-	_world.Init(sgc, sgc.WINDOW_WIDTH, sgc.WINDOW_HEIGHT);
+	_world.Init(sgc, sf::Vector2f(sgc.WINDOW_WIDTH / 2, sgc.WINDOW_HEIGHT / 2), 2, sgc.WINDOW_WIDTH, sgc.WINDOW_HEIGHT);
 
 	if (_isWorldGen)
 	{
@@ -141,7 +142,7 @@ void Game::MoveWorld()
 
 		if (_isWorldGen)
 		{
-			if (_world.UpdateCenterChunk(_worldView.getCenter()))
+			if (_world.IsNewChunkInView(_worldView.getCenter()))
 			{
 				Pipe::SendMessage(MessageType::LOAD, MessageDestination::LOADCHUNKS);
 			}
@@ -266,7 +267,7 @@ void Game::LoadChunks()
 			switch (message.GetMessageType())
 			{
 				case MessageType::LOAD:
-					_world.UpdateChunksToStaging(_isGreyScale);
+					_world.LoadChunksToStaging(_isGreyScale);
 					Pipe::SendMessage(MessageType::LOADED, MessageDestination::GRAPHICS);
 					break;
 				case MessageType::STOP:
@@ -274,6 +275,13 @@ void Game::LoadChunks()
 					break;
 			}
 		}
+
+		//Fixes issue wherein you travel through two chunks and so 
+		//send two messages to this thread, then it loads the first,
+		//and locks the mutex again before chunks can be merged.
+		//Should use conditional_variable and lock until main thread 
+		//can merge the chunks.
+		std::this_thread::sleep_for(std::chrono::seconds(2));
 	}
 
 	printf("Load Chunks Thread Ending.");
