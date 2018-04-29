@@ -12,7 +12,8 @@ class Orbit
 
 		void Draw(sf::RenderTarget* target);
 
-		void CalculateOrbitAngle(std::mt19937& engine);
+		void GenerateRandomOrbitAngle(std::mt19937& engine);
+		void GenerateRandomVelocity(std::mt19937& engine);
 		void CalculateNextOrbitAngle(sf::Time elapsed);
 		sf::Vector2f GetOrbitPosition();
 

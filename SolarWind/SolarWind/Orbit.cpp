@@ -24,9 +24,16 @@ void Orbit::Init(SGC sgc)
 	_orbit.setPointCount(100);
 	_orbit.setFillColor(sf::Color::Transparent);
 	_orbit.setOutlineThickness(-1.0f);	
+
 }
 
-void Orbit::CalculateOrbitAngle(std::mt19937& engine)
+void Orbit::GenerateRandomVelocity(std::mt19937& engine)
+{
+	std::uniform_real_distribution<float> velocities(0.009f, 0.1f);
+	SetVelocity(velocities(engine));
+}
+
+void Orbit::GenerateRandomOrbitAngle(std::mt19937& engine)
 {
 	_angle = _degreeUID(engine) * (2 * PI / 360.0f);
 	//_angle = PI / 2.0f;
@@ -35,8 +42,6 @@ void Orbit::CalculateOrbitAngle(std::mt19937& engine)
 void Orbit::CalculateNextOrbitAngle(sf::Time elapsed)
 {
 	_angle += _velocity * elapsed.asSeconds();
-	if (_angle > 2 * PI)
-		_angle = 0.0f;
 }
 
 sf::Vector2f Orbit::GetOrbitPosition()

@@ -129,7 +129,7 @@ void SolarSystem::Draw(sf::RenderTarget* target)
 	target->draw(_spriteSystem);
 }
 
-void SolarSystem::Update(sf::Vector2i mousePos)
+void SolarSystem::Update(sf::Vector2i mousePos, sf::Time elapsed)
 {
 	_nameText.setFillColor(sf::Color::Transparent);
 	_star.SetColor(sf::Color::Red);
@@ -159,14 +159,30 @@ void SolarSystem::Update(sf::Vector2i mousePos)
 		}
 	}
 
-	//SimulatePlanets();
+	SimulatePlanets(elapsed);
 }
 
-void SolarSystem::SimulatePlanets()
+bool SolarSystem::IsPointWithinPlanet(sf::Vector2i mousePos)
+{
+	bool isWithinPlanet = false;
+
+	for (Planet& planet : _planets)
+	{
+		if (planet.IsWithin(mousePos))
+		{
+			isWithinPlanet = true;
+			break;
+		}
+	}
+
+	return isWithinPlanet;
+}
+
+void SolarSystem::SimulatePlanets(sf::Time elapsed)
 {
 	for (Planet& planet : _planets)
 	{
-		planet.UpdateOrbit();
+		planet.UpdateOrbit(elapsed);
 		planet.CalculatePosition();
 	}
 }

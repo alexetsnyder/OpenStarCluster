@@ -6,7 +6,8 @@ enum MessageType
 {
 	STOP,
 	LOAD,
-	LOADED
+	LOADED,
+	MERGED
 };
 
 enum MessageDestination

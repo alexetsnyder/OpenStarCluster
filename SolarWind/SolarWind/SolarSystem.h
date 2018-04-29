@@ -32,7 +32,8 @@ class SolarSystem
 		void GenerateSolarSystem(std::mt19937& engine);
 
 		void CreateTexture();
-		void Update(sf::Vector2i mousePos);
+		bool IsPointWithinPlanet(sf::Vector2i mousePos);
+		void Update(sf::Vector2i mousePos, sf::Time elapsed);
 		void Draw(sf::RenderTarget* target);
 
 		bool IsGenerated() { return _isGenerated; }
@@ -43,16 +44,19 @@ class SolarSystem
 		void SetMaxRadius(float maxRadius) { _maxRadius = maxRadius; }
 
 	private:
-		void SimulatePlanets();
+		void SimulatePlanets(sf::Time elapsed);
 		sf::Vector2f GetTextPosition(sf::Vector2i mousePos);
 
 		SGC _sgc;
 		SolarSystemConstants _ssc;
+
 		sf::Font _font;
 		sf::Text _nameText;
+
 		bool _isGenerated;
 		float _maxRadius;
 		sf::Vector2f _center;
+
 		Star _star;
 		std::vector<Planet> _planets;
 		sf::Sprite _spriteSystem;

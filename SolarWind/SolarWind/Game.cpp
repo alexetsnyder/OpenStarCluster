@@ -37,7 +37,7 @@ void Game::Start()
 	ssc.PlanetMinPercOfStarRadius = 0.20f;
 	ssc.PlanetMaxPercOfStarRadius = 0.40f;
 
-	_isWorldGen = true;
+	_isWorldGen = false;
 	_isGreyScale = false;
 	_isMoveWorld = false;
 
@@ -67,6 +67,7 @@ void Game::Start()
 
 	std::thread loadChunksThread(&Game::LoadChunks, this);
 
+	_clock.restart();
 	Loop();
 
 	Pipe::SendMessage(MessageType::STOP, MessageDestination::LOADCHUNKS);
@@ -111,7 +112,7 @@ void Game::Update()
 	else
 	{
 		_window.setView(_solarSystemView);
-		_solarSystem.Update(_mousePos);
+		_solarSystem.Update(_mousePos, _clock.restart());
 		_solarSystem.CreateTexture();
 	}
 
@@ -140,12 +141,9 @@ void Game::MoveWorld()
 		_prvMousePos.x = _mousePos.x;
 		_prvMousePos.y = _mousePos.y;
 
-		if (_isWorldGen)
+		if (_world.IsNewChunkInView(_worldView.getCenter()))
 		{
-			if (_world.IsNewChunkInView(_worldView.getCenter()))
-			{
-				Pipe::SendMessage(MessageType::LOAD, MessageDestination::LOADCHUNKS);
-			}
+			Pipe::SendMessage(MessageType::LOAD, MessageDestination::LOADCHUNKS);
 		}
 	}
 }
@@ -204,16 +202,26 @@ void Game::PollEvents()
 		}
 		if (event.type == sf::Event::MouseButtonPressed)
 		{
-			sf::Vector2f worldPos = _window.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
-			printf("x: %.0f y: %.0f\n", worldPos.x, worldPos.y);
+			/*sf::Vector2f worldPos = _window.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
+			printf("x: %.0f y: %.0f\n", worldPos.x, worldPos.y);*/
 			_prvMousePos.x = event.mouseButton.x;
 			_prvMousePos.y = event.mouseButton.y;
 			_isMoveWorld = true;
+
+			sf::Vector2i mousePos(event.mouseButton.x, event.mouseButton.y);
+			if (!_isWorldGen && _solarSystem.IsPointWithinPlanet(mousePos))
+			{
+				_isWorldGen = true;
+				if (!_world.IsGenerated())
+				{
+					_world.Generate(_isGreyScale);
+				}
+			}
 		}
 		if (event.type == sf::Event::MouseButtonReleased)
 		{
-			sf::Vector2f worldPos = _window.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
-			printf("x: %.0f y: %.0f\n", worldPos.x, worldPos.y);
+			/*sf::Vector2f worldPos = _window.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
+			printf("x: %.0f y: %.0f\n", worldPos.x, worldPos.y);*/
 			_isMoveWorld = false;
 		}
 		if (event.type == sf::Event::MouseWheelScrolled)
@@ -275,13 +283,6 @@ void Game::LoadChunks()
 					break;
 			}
 		}
-
-		//Fixes issue wherein you travel through two chunks and so 
-		//send two messages to this thread, then it loads the first,
-		//and locks the mutex again before chunks can be merged.
-		//Should use conditional_variable and lock until main thread 
-		//can merge the chunks.
-		std::this_thread::sleep_for(std::chrono::seconds(2));
 	}
 
 	printf("Load Chunks Thread Ending.");

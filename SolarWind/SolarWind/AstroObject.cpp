@@ -62,13 +62,13 @@ void Planet::CreateOrbit(std::mt19937 engine, sf::Vector2f orbitPos, float orbit
 	_orbit.Init(GetSGC());
 	_orbit.SetRadius(orbitRadius);
 	_orbit.SetPosition(sf::Vector2f(orbitPos.x, orbitPos.y));
-	_orbit.SetVelocity(0.00005f);
-	_orbit.CalculateOrbitAngle(engine);
+	_orbit.GenerateRandomVelocity(engine);
+	_orbit.GenerateRandomOrbitAngle(engine);
 }
 
-void Planet::UpdateOrbit()
+void Planet::UpdateOrbit(sf::Time elapsed)
 {
-
+	_orbit.CalculateNextOrbitAngle(elapsed);
 }
 
 void Planet::CalculatePosition()

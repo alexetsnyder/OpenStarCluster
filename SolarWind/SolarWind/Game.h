@@ -23,6 +23,7 @@ class Game
 
 	private:
 		sf::RenderWindow _window;
+		sf::Clock _clock;
 
 		std::mt19937 _engine;
 		sf::Vector2i _mousePos;
