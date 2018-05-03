@@ -65,17 +65,22 @@ void WorldGen::LoadChunks(bool greyScale)
 	float chunkHeight = _chunkHeight;
 	int count = 0;
 
+	float noiseX = chunkCenter.x - _chunkCount * _chunkWidth / 4;
 	for (float i = chunkCenter.x - _chunkCount * chunkWidth; i <= chunkCenter.x + _chunkCount * chunkWidth; i += chunkWidth)
 	{
+		float noiseY = chunkCenter.y - _chunkCount * _chunkHeight / 4;
 		for (float j = chunkCenter.y - _chunkCount * chunkHeight; j <= chunkCenter.y + _chunkCount * chunkHeight; j += chunkHeight)
 		{
 			sf::Vector2f newChunkCenter(i, j);
+			sf::Vector2f newNoiseCenter(noiseX, noiseY);
 			if (!Contains(newChunkCenter))
 			{
-				_chunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale)));
+				_chunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, newNoiseCenter, chunkWidth, chunkHeight, greyScale)));
 				++count;
 			}
+			noiseY += chunkHeight / 4;
 		}
+		noiseX += chunkWidth / 4;
 	}
 
 	printf("Total number of Chunks: %d\n", count);
@@ -105,24 +110,31 @@ void WorldGen::LoadChunksToStaging(bool greyScale)
 {
 	_staging.lock();
 	sf::Vector2f chunkCenter = _centerChunk.GetVector2f();
+	Chunk* centerChunk = _chunks[chunkCenter]; 
 	float chunkWidth = _chunkWidth;
 	float chunkHeight = _chunkHeight;
 	int count = 0;
 
+	float noiseX = centerChunk->GetNoiseCenter().x - _chunkCount * _chunkWidth / 4;
 	for (float i = chunkCenter.x - _chunkCount * chunkWidth; i <= chunkCenter.x + _chunkCount * chunkWidth; i += chunkWidth)
 	{
+		float noiseY = centerChunk->GetNoiseCenter().y - _chunkCount * _chunkHeight / 4;
 		for (float j = chunkCenter.y - _chunkCount * chunkHeight; j <= chunkCenter.y + _chunkCount * chunkHeight; j += chunkHeight)
 		{
 			sf::Vector2f newChunkCenter(i, j);
+			sf::Vector2f newNoiseCenter(noiseX, noiseY);
 			if (!Contains(newChunkCenter))
 			{
-				_stagingChunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, chunkWidth, chunkHeight, greyScale)));
+				_stagingChunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, newNoiseCenter, chunkWidth, chunkHeight, greyScale)));
 				++count;
 			}
+			noiseY += chunkHeight / 4;
 		}
+		noiseX += chunkWidth / 4;
 	}
 	_staging.unlock();
 
+	centerChunk = nullptr;
 	printf("Total number of Chunks To Staging: %d\n", count);
 }
 
@@ -164,20 +176,20 @@ bool WorldGen::Contains(Pair key)
 
 bool WorldGen::IsViewCenterInChunk(Chunk* chunk, sf::Vector2f viewCenter)
 {
-	float deltaX = chunk->GetCenter().x - viewCenter.x;
-	float deltaY = chunk->GetCenter().y - viewCenter.y;
+	float deltaX = chunk->GetChunkCenter().x - viewCenter.x;
+	float deltaY = chunk->GetChunkCenter().y - viewCenter.y;
 	deltaX = (deltaX < 0) ? -1 * deltaX : deltaX;
 	deltaY = (deltaY < 0) ? -1 * deltaY : deltaY;
 
-	return (deltaX <= chunk->GetWidth() && deltaY <= chunk->GetHeight());
+	return (deltaX <= chunk->GetChunkWidth() && deltaY <= chunk->GetChunkHeight());
 
 }
 
 bool WorldGen::IsChunkWithinDistanceToCenter(Chunk* chunk)
 {
 	sf::Vector2f chunkCenter = _centerChunk.GetVector2f();
-	float deltaX = chunk->GetCenter().x - chunkCenter.x;
-	float deltaY = chunk->GetCenter().y - chunkCenter.y;
+	float deltaX = chunk->GetChunkCenter().x - chunkCenter.x;
+	float deltaY = chunk->GetChunkCenter().y - chunkCenter.y;
 	deltaX = (deltaX < 0) ? -1 * deltaX : deltaX;
 	deltaY = (deltaY < 0) ? -1 * deltaY : deltaY;
 

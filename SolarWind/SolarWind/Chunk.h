@@ -7,7 +7,7 @@ class Chunk
 {
 	public:
 		Chunk();
-		Chunk(SGC sgc, sf::Vector2f center, int width, int height, bool greyScale);
+		Chunk(SGC sgc, sf::Vector2f chunkCenter, sf::Vector2f noiseCenter, int width, int height, bool greyScale);
 
 		void Init();
 		void CreateChunk();
@@ -15,9 +15,10 @@ class Chunk
 		void Update();
 		void Draw(sf::RenderTarget* target);
 
-		sf::Vector2f GetCenter() { return _center; }	
-		int GetWidth() { return _width; }
-		int GetHeight() { return _height; }	
+		sf::Vector2f GetChunkCenter() { return _chunkCenter; }	
+		sf::Vector2f GetNoiseCenter() { return _noiseCenter; }
+		int GetChunkWidth() { return _chunkWidth; }
+		int GetChunkHeight() { return _chunkHeight; }	
 
 		void SetSGC(SGC sgc) { _sgc = sgc; }
 
@@ -26,9 +27,11 @@ class Chunk
 		sf::Uint8 Clamp(float rawNoise);
 
 		SGC _sgc;
-		int _width;
-		int _height;
-		sf::Vector2f _center;
+		int _chunkWidth;
+		int _chunkHeight;
+		sf::Vector2f _chunkCenter;
+		sf::Vector2f _noiseCenter;
+
 		bool _isGreyScale;
 		bool _isGenerated;
 

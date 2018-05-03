@@ -47,17 +47,10 @@ void Game::Start()
 	_solarSystem.SetMaxRadius(radius);
 	_solarSystem.SetSSC(ssc);
 	_solarSystem.Init(sgc);
+	_solarSystem.GenerateSolarSystem(_engine);
 
-	_world.Init(sgc, sf::Vector2f(sgc.WINDOW_WIDTH / 2, sgc.WINDOW_HEIGHT / 2), 2, sgc.WINDOW_WIDTH, sgc.WINDOW_HEIGHT);
-
-	if (_isWorldGen)
-	{
-		_world.Generate(_isGreyScale);
-	}
-	else
-	{
-		_solarSystem.GenerateSolarSystem(_engine);
-	}
+	_world.Init(sgc, sf::Vector2f(sgc.WINDOW_WIDTH / 2, sgc.WINDOW_HEIGHT / 2), 3); 
+	_world.Generate(_isGreyScale);
 
 	_worldView.reset(sf::FloatRect(0, 0, 800, 800));
 	_solarSystemView.reset(sf::FloatRect(0.0f, 0.0f, 800, 800));

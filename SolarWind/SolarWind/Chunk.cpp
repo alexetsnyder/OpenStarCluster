@@ -6,12 +6,13 @@ Chunk::Chunk()
 
 }
 
-Chunk::Chunk(SGC sgc, sf::Vector2f center, int width, int height, bool greyScale)
+Chunk::Chunk(SGC sgc, sf::Vector2f chunkCenter, sf::Vector2f noiseCenter, int width, int height, bool greyScale)
 {
 	_sgc = sgc;
-	_center = center;
-	_width = width;
-	_height = height;
+	_chunkCenter = chunkCenter;
+	_noiseCenter = noiseCenter;
+	_chunkWidth = width;
+	_chunkHeight = height;
 	_isGreyScale = greyScale;
 	_isGenerated = false;
 
@@ -24,12 +25,12 @@ void Chunk::Init()
 	_heightNoise.SetNoiseType(FastNoise::SimplexFractal);
 	_heightNoise.SetFractalOctaves(34);
 
-	if (!_chunk.create(_width, _height))
+	if (!_chunk.create(_chunkWidth, _chunkHeight))
 	{
 		printf("Could not create chunk render texture.");
 	}
 	_chunkSprite.setTexture(_chunk.getTexture());
-	_chunkSprite.setPosition(_center.x - _width / 2, _center.y - _height / 2);
+	_chunkSprite.setPosition(_chunkCenter.x - _chunkWidth / 2, _chunkCenter.y - _chunkHeight / 2);
 
 	CreateChunk();
 }
@@ -41,13 +42,13 @@ void Chunk::CreateChunk()
 
 	if (!_isGreyScale)
 	{	
-		int x = _center.x - _width / 2;
-		int y = _center.y - _height / 2;
-		for (int i = 0; i < _width / 4; ++i)
+		int x = _noiseCenter.x - _chunkWidth / 4;
+		int y = _noiseCenter.y - _chunkHeight / 4;
+		for (int i = 0; i < _chunkWidth / 4; ++i)
 		{
-			for (int j = 0; j < _height / 4; ++j)
+			for (int j = 0; j < _chunkHeight / 4; ++j)
 			{
-				sf::Uint8 height = Clamp((_heightNoise.GetNoise(x + 4 * i, y + 4 * j) + 1) / 2);
+				sf::Uint8 height = Clamp((_heightNoise.GetNoise(x + i, y + j) + 1) / 2);
 				gridSquare.setPosition(4 * i, 4 * j);
 				gridSquare.setSize(sf::Vector2f(4.0f, 4.0f));
 				gridSquare.setFillColor(GenerateBiomeColor(height));
@@ -57,13 +58,13 @@ void Chunk::CreateChunk()
 	}
 	else
 	{
-		int x = _center.x - _width / 2;
-		int y = _center.y - _height / 2;
-		for (int i = 0; i < _width / 4; ++i)
+		int x = _noiseCenter.x - _chunkWidth / 2;
+		int y = _noiseCenter.y - _chunkHeight / 2;
+		for (int i = 0; i < _chunkWidth / 4; ++i)
 		{
-			for (int j = 0; j < _height / 4; ++j)
+			for (int j = 0; j < _chunkHeight / 4; ++j)
 			{
-				sf::Uint8 height = Clamp((_heightNoise.GetNoise(x + 4 * i, y + 4 * j) + 1) / 2);
+				sf::Uint8 height = Clamp((_heightNoise.GetNoise(x + i, y + j) + 1) / 2);
 				gridSquare.setPosition(4 * i, 4 * j);
 				gridSquare.setSize(sf::Vector2f(4.0f, 4.0f));
 				gridSquare.setFillColor(sf::Color(height, height, height, 0xFF));
