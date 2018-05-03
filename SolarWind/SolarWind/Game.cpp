@@ -18,38 +18,36 @@ void Game::Start()
 	printf("Seed: %d\n", seed);
 	printf("---------------------------------------------\n");
 
-	SGC sgc;
-	sgc.WINDOW_WIDTH = 800;
-	sgc.WINDOW_HEIGHT = 800;
-	sgc.SEED = seed;
+	_sgc.WINDOW_WIDTH = 800;
+	_sgc.WINDOW_HEIGHT = 800;
+	_sgc.SEED = seed;
 
-	_window.create(sf::VideoMode(sgc.WINDOW_WIDTH, sgc.WINDOW_HEIGHT), "Solar Wind!");
+	_window.create(sf::VideoMode(_sgc.WINDOW_WIDTH, _sgc.WINDOW_HEIGHT), "Solar Wind!");
 
-	SolarSystemConstants ssc;
-	ssc.PlanetPadding = 0.0f;
-	ssc.TotalPlanetCount = 12;
-	ssc.StarMinPercOfMaxSize = 0.05f;
-	ssc.StarMaxPercOfMaxSize = 0.10f;
-	ssc.OrbitMinPercGrowth = 0.01f;
-	ssc.OrbitMaxPercGrowth = 0.05f;
-	ssc.OrbitMinPercOfStarRadius = 0.05f;
-	ssc.OrbitMaxPercOfStarRadius = 0.20f;
-	ssc.PlanetMinPercOfStarRadius = 0.20f;
-	ssc.PlanetMaxPercOfStarRadius = 0.40f;
+	_ssc.PlanetPadding = 0.0f;
+	_ssc.TotalPlanetCount = 12;
+	_ssc.StarMinPercOfMaxSize = 0.05f;
+	_ssc.StarMaxPercOfMaxSize = 0.10f;
+	_ssc.OrbitMinPercGrowth = 0.01f;
+	_ssc.OrbitMaxPercGrowth = 0.05f;
+	_ssc.OrbitMinPercOfStarRadius = 0.05f;
+	_ssc.OrbitMaxPercOfStarRadius = 0.20f;
+	_ssc.PlanetMinPercOfStarRadius = 0.20f;
+	_ssc.PlanetMaxPercOfStarRadius = 0.40f;
 
 	_isWorldGen = false;
 	_isGreyScale = false;
 	_isMoveWorld = false;
 
-	float radius = GetInscribedCircleRadius(sgc.WINDOW_WIDTH, sgc.WINDOW_HEIGHT);
-	sf::Vector2f center = sf::Vector2f(sgc.WINDOW_WIDTH / 2.0f, sgc.WINDOW_HEIGHT / 2.0f);
+	float radius = GetInscribedCircleRadius(_sgc.WINDOW_WIDTH, _sgc.WINDOW_HEIGHT);
+	sf::Vector2f center = sf::Vector2f(_sgc.WINDOW_WIDTH / 2.0f, _sgc.WINDOW_HEIGHT / 2.0f);
 	_solarSystem.SetCenter(center);
 	_solarSystem.SetMaxRadius(radius);
-	_solarSystem.SetSSC(ssc);
-	_solarSystem.Init(sgc);
+	_solarSystem.SetSSC(_ssc);
+	_solarSystem.Init(_sgc);
 	_solarSystem.GenerateSolarSystem(_engine);
 
-	_world.Init(sgc, sf::Vector2f(sgc.WINDOW_WIDTH / 2, sgc.WINDOW_HEIGHT / 2), 3); 
+	_world.Init(_sgc, sf::Vector2f(_sgc.WINDOW_WIDTH / 2, _sgc.WINDOW_HEIGHT / 2), 3);
 	_world.Generate(_isGreyScale);
 
 	_worldView.reset(sf::FloatRect(0, 0, 800, 800));

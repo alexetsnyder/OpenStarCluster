@@ -22,6 +22,9 @@ class Game
 		void LoadChunks();
 
 	private:
+		SGC _sgc;
+		SolarSystemConstants _ssc;
+
 		sf::RenderWindow _window;
 		sf::Clock _clock;
 

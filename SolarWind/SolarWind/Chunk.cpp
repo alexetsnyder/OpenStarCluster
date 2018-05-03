@@ -97,9 +97,13 @@ sf::Color Chunk::GenerateBiomeColor(sf::Uint8 noiseValue)
 	{
 		biomeColor = Color::PineForest;
 	}
-	else
+	else if (noiseValue <= 200.0f)
 	{
 		biomeColor = Color::Mountain;
+	}
+	else
+	{
+		biomeColor = Color::Snow;
 	}
 
 	return biomeColor;

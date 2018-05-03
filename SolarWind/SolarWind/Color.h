@@ -13,6 +13,7 @@ class Color
 		static const sf::Color Jungle;
 		static const sf::Color Savannah;
 		static const sf::Color Desert;
+		static const sf::Color Snow;
 };
 
 const sf::Color Color::Sand = sf::Color(76, 70, 50);
@@ -24,3 +25,4 @@ const sf::Color Color::PineForest = sf::Color(0, 47, 44);
 const sf::Color Color::Jungle = sf::Color(16, 67, 53);
 const sf::Color Color::Savannah = sf::Color(248, 199, 23);
 const sf::Color Color::Desert = sf::Color(93, 79, 69);
+const sf::Color Color::Snow = sf::Color(255, 250, 250);
