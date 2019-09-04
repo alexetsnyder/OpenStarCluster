@@ -6,7 +6,14 @@ Chunk::Chunk()
 
 }
 
-Chunk::Chunk(SGC sgc, sf::Vector2f chunkCenter, sf::Vector2f noiseCenter, int width, int height, bool greyScale)
+Chunk::Chunk(SGC sgc, sf::Vector2f chunkCenter, sf::Vector2f noiseCenter,
+	         int width, int height, std::vector<unsigned int> seeds, bool greyScale)
+{
+	Init(sgc, chunkCenter, noiseCenter, width, height, seeds, greyScale);
+}
+
+void Chunk::Init(SGC sgc, sf::Vector2f chunkCenter, sf::Vector2f noiseCenter,
+	             int width, int height, std::vector<unsigned int> seeds, bool greyScale)
 {
 	_sgc = sgc;
 	_chunkCenter = chunkCenter;
@@ -16,14 +23,13 @@ Chunk::Chunk(SGC sgc, sf::Vector2f chunkCenter, sf::Vector2f noiseCenter, int wi
 	_isGreyScale = greyScale;
 	_isGenerated = false;
 
-	Init();
-}
-
-void Chunk::Init()
-{
-	_heightNoise.SetSeed(_sgc.SEED);
+	_heightNoise.SetSeed(seeds[0]);
 	_heightNoise.SetNoiseType(FastNoise::SimplexFractal);
 	_heightNoise.SetFractalOctaves(34);
+
+	_temperatureNoise.SetSeed(seeds[1]);
+	_temperatureNoise.SetNoiseType(FastNoise::SimplexFractal);
+	_temperatureNoise.SetFractalOctaves(34);
 
 	if (!_chunk.create(_chunkWidth, _chunkHeight))
 	{
@@ -31,13 +37,65 @@ void Chunk::Init()
 	}
 	_chunkSprite.setTexture(_chunk.getTexture());
 	_chunkSprite.setPosition(_chunkCenter.x - _chunkWidth / 2, _chunkCenter.y - _chunkHeight / 2);
+}
 
-	CreateChunk();
+void Chunk::GenerateHeightMap()
+{	
+	int x = _noiseCenter.x - _chunkWidth / 4;
+	int y = _noiseCenter.y - _chunkHeight / 4;
+	for (int i = 0; i < _chunkWidth / 4; ++i)
+	{
+		_heightMap.push_back(std::vector<sf::Uint8>());
+		for (int j = 0; j < _chunkHeight / 4; ++j)
+		{
+			sf::Uint8 height = Clamp((_heightNoise.GetNoise(x + i, y + j) + 1) / 2);
+			_heightMap[i].push_back(height);
+		}
+	}
+}
+
+void Chunk::GenerateTemperatureMap()
+{
+	int x = _noiseCenter.x - _chunkWidth / 4;
+	int y = _noiseCenter.y - _chunkHeight / 4;
+	for (int i = 0; i < _chunkWidth / 4; ++i)
+	{
+		_temperatureMap.push_back(std::vector<sf::Uint8>());
+		for (int j = 0; j < _chunkHeight / 4; ++j)
+		{
+			sf::Uint8 height = Clamp((_temperatureNoise.GetNoise(x + i, y + j) + 1) / 2);
+			_temperatureMap[i].push_back(height);
+		}
+	}
+}
+
+void Chunk::GenerateChunk()
+{
+	GenerateHeightMap();
+	GenerateTemperatureMap();
+
+	sf::RectangleShape gridSquare;
+	_chunk.clear(sf::Color::White);
+
+	for (int i = 0; i < _heightMap.size(); ++i)
+	{
+		for (int j = 0; j < _heightMap[i].size(); ++j)
+		{
+			gridSquare.setPosition(4 * i, 4 * j);
+			gridSquare.setSize(sf::Vector2f(4.0f, 4.0f));
+			sf::Color tileColor = GenerateBiomeColor(i, j);
+			gridSquare.setFillColor(tileColor);
+			_chunk.draw(gridSquare);
+		}
+	}
+
+	_chunk.display();
+	_isGenerated = true;
 }
 
 void Chunk::CreateChunk()
 {
-	sf::RectangleShape gridSquare;
+	/*sf::RectangleShape gridSquare;
 	_chunk.clear(sf::Color::White);
 
 	if (!_isGreyScale)
@@ -74,30 +132,58 @@ void Chunk::CreateChunk()
 	}
 
 	_chunk.display();
-	_isGenerated = true;
+	_isGenerated = true;*/
 }
 
-sf::Color Chunk::GenerateBiomeColor(sf::Uint8 noiseValue)
+sf::Color Chunk::GenerateBiomeColor(int i, int j)
 {
-	sf::Color biomeColor;
+	sf::Uint8 height = _heightMap[i][j];
+	sf::Uint8 temperature = _temperatureMap[i][j];
 
-	if (noiseValue <= 70.0f)
+	sf::Color biomeColor;
+	if (height <= 70.0f)
 	{
 		biomeColor = Color::ClearWaterBlue;
 	}
-	else if (noiseValue <= 80.0f)
+	else if (height <= 80.0f)
 	{
 		biomeColor = Color::Sand;
 	}
-	else if (noiseValue <= 120.0f)
+	else if (height <= 120.0f)
 	{
-		biomeColor = Color::Forest;
+		if (temperature <= 85)
+		{
+			biomeColor = Color::Snow;
+		}
+		else if (temperature <= 170)
+		{
+			biomeColor = Color::GrassLand;
+		}
+		else
+		{
+			biomeColor = Color::Savannah;
+		}
 	}
-	else if (noiseValue <= 160.0f)
+	else if (height <= 160.0f)
 	{
-		biomeColor = Color::PineForest;
+		if (temperature <= 85)
+		{
+			biomeColor = Color::PineForest;
+		}
+		else if (temperature <= 170)
+		{
+			biomeColor = Color::Forest;
+		}
+		else
+		{
+			biomeColor = Color::Jungle;
+		}	
 	}
-	else if (noiseValue <= 200.0f)
+	else if (height <= 200.0f)
+	{
+		biomeColor = Color::Hills;
+	}
+	else if (height <= 220.0f)
 	{
 		biomeColor = Color::Mountain;
 	}

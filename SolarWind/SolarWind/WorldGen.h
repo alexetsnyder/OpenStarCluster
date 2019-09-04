@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <random>
 #include <map>
 #include <mutex>
 #include "FastNoise.h"
@@ -59,8 +60,11 @@ class WorldGen
 		SGC _sgc;
 		int _chunkWidth;
 		int _chunkHeight;
-		sf::Vector2f _origin;
+	
 		int _chunkCount;
+		std::mt19937 _engine;
+		std::vector<unsigned int> _seeds;
+		sf::Vector2f _origin;
 
 		bool _isGenerated;
 		Pair _centerChunk;

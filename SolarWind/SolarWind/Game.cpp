@@ -15,7 +15,7 @@ void Game::Start()
 	_engine.seed(seed);
 
 	printf("---------------------------------------------\n");
-	printf("Seed: %d\n", seed);
+	printf("Seed: %u\n", seed);
 	printf("---------------------------------------------\n");
 
 	_sgc.WINDOW_WIDTH = 800;
@@ -274,6 +274,8 @@ void Game::LoadChunks()
 					break;
 			}
 		}
+
+		std::this_thread::sleep_for(std::chrono::seconds(2));
 	}
 
 	printf("Load Chunks Thread Ending.");

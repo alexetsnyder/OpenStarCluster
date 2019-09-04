@@ -45,6 +45,12 @@ void WorldGen::Init(SGC sgc, sf::Vector2f origin, int chunkCount, int width, int
 	_isGenerated = false;
 	_chunkCount = chunkCount;
 	_centerChunk = Pair(origin);
+	_engine.seed(_sgc.SEED);
+
+	for (int i = 0; i < 2; ++i)
+	{
+		_seeds.push_back(_engine());
+	}
 }
 
 void WorldGen::Generate(bool greyScale)
@@ -75,7 +81,8 @@ void WorldGen::LoadChunks(bool greyScale)
 			sf::Vector2f newNoiseCenter(noiseX, noiseY);
 			if (!Contains(newChunkCenter))
 			{
-				_chunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, newNoiseCenter, chunkWidth, chunkHeight, greyScale)));
+				_chunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, newNoiseCenter, chunkWidth, chunkHeight, _seeds, greyScale)));
+				_chunks[newChunkCenter]->GenerateChunk();
 				++count;
 			}
 			noiseY += chunkHeight / 4;
@@ -125,7 +132,8 @@ void WorldGen::LoadChunksToStaging(bool greyScale)
 			sf::Vector2f newNoiseCenter(noiseX, noiseY);
 			if (!Contains(newChunkCenter))
 			{
-				_stagingChunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, newNoiseCenter, chunkWidth, chunkHeight, greyScale)));
+				_stagingChunks.insert(std::make_pair(newChunkCenter, new Chunk(_sgc, newChunkCenter, newNoiseCenter, chunkWidth, chunkHeight, _seeds, greyScale)));
+				_stagingChunks[newChunkCenter]->GenerateChunk();
 				++count;
 			}
 			noiseY += chunkHeight / 4;
